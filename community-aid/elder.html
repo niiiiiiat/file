@@ -582,36 +582,72 @@ input:focus {
   <button class="secondary hidden" id="logoutBtn" onclick="showScreen('login')">登出</button>
 </header>
 <!-- =========================
-       身分驗證
+       身分驗證（入口選擇）
   ========================= -->
 <section id="login" class="screen">
   <h2>身分驗證</h2>
-  <p>請選擇登入方式</p>
+  <p>請選擇您的操作</p>
+  <!-- 老人自行登入 -->
+  <button class="choice" onclick="showScreen('elderLogin')">
+    <span class="icon">👴</span>
+    <strong>老人自行登入</strong>
+    <span>我已經有帳號，輸入姓名即可登入</span>
+  </button>
+  <!-- 老人自行註冊 -->
+  <button class="choice" style="border-color:var(--mint)" onclick="showScreen('elderRegister')">
+    <span class="icon">📝</span>
+    <strong>老人自行註冊</strong>
+    <span>第一次使用？填寫資料建立帳號</span>
+  </button>
   <!-- 小孩代辦 -->
   <button class="choice" onclick="showScreen('childLogin')">
     <span class="icon">👨‍👩‍👧</span>
-    <strong>小孩代辦登入</strong>
-    <span>由子女或家人協助設定帳號，老人不需要自己記住帳號密碼</span>
+    <strong>小孩代辦設定</strong>
+    <span>由子女或家人協助設定長輩帳號</span>
   </button>
-  <!-- 老人自行登入 -->
-  <button class="choice" style="border-color:#a8d58f" onclick="showScreen('elderLogin')">
-    <span class="icon">👴</span>
-    <strong>老人自行登入</strong>
-    <span>我已經有帳號，可以自己登入</span>
-  </button>
-  <div class="notice">
-    <strong>還沒有帳號嗎？</strong><br>
-    請由您的子女或家人協助申請帳號。
-  </div>
   <a href="index.html" class="home-link">← 返回角色選擇</a>
 </section>
 <!-- =========================
-       小孩代辦
+       老人自行登入（僅輸入姓名）
+  ========================= -->
+<section id="elderLogin" class="screen hidden">
+  <div class="form">
+    <h2>老人自行登入</h2>
+    <p>請輸入您註冊時使用的姓名。</p>
+    <label>姓名</label>
+    <input id="elderLoginName" placeholder="請輸入您的姓名">
+    <div id="elderLoginError" style="color:var(--rose);font-size:18px;margin:-10px 0 10px;display:none;">找不到此帳號，請先註冊。</div>
+    <button class="primary" onclick="elderLogin()">登入</button>
+    <button class="secondary back" onclick="showScreen('login')">← 返回</button>
+  </div>
+</section>
+<!-- =========================
+       老人自行註冊（填完整資料）
+  ========================= -->
+<section id="elderRegister" class="screen hidden">
+  <div class="form">
+    <h2>老人自行註冊</h2>
+    <p>請填寫以下資料建立帳號。</p>
+    <label>姓名</label>
+    <input id="regName" placeholder="例如：王阿姨">
+    <label>年紀</label>
+    <input id="regAge" type="number" placeholder="例如：72">
+    <label>住家地址</label>
+    <input id="regAddress" placeholder="例如：高雄市○○區○○路">
+    <label>聯絡電話</label>
+    <input id="regPhone" type="tel" placeholder="例如：0912-345-678">
+    <div id="elderRegError" style="color:var(--rose);font-size:18px;margin:-10px 0 10px;display:none;"></div>
+    <button class="primary" onclick="elderRegister()">建立帳號並登入</button>
+    <button class="secondary back" onclick="showScreen('login')">← 返回</button>
+  </div>
+</section>
+<!-- =========================
+       小孩代辦（填完整資料，會建立帳號）
   ========================= -->
 <section id="childLogin" class="screen hidden">
   <div class="form">
     <h2>小孩代辦設定</h2>
-    <p>請由家人協助填寫長輩資料。</p>
+    <p>請由家人協助填寫長輩資料。若帳號已存在則直接登入。</p>
     <label>老人姓名</label>
     <input id="childName" placeholder="例如：王阿姨">
     <label>年紀</label>
@@ -621,24 +657,6 @@ input:focus {
     <label>家人聯絡電話</label>
     <input id="childPhone" type="tel" placeholder="例如：0912-345-678">
     <button class="primary" onclick="saveChildProfile()">完成設定並登入</button>
-    <button class="secondary back" onclick="showScreen('login')">← 返回</button>
-  </div>
-</section>
-<!-- =========================
-       老人自行登入
-  ========================= -->
-<section id="elderLogin" class="screen hidden">
-  <div class="form">
-    <h2>老人自行登入</h2>
-    <label>姓名</label>
-    <input id="elderName" placeholder="請輸入您的姓名">
-    <label>年紀</label>
-    <input id="elderAge" type="number" placeholder="例如：75">
-    <label>住家地址</label>
-    <input id="elderAddress" placeholder="請輸入住家地址">
-    <label>電話</label>
-    <input id="elderPhone" type="tel" placeholder="例如：0912-345-678">
-    <button class="primary" onclick="elderLogin()">登入</button>
     <button class="secondary back" onclick="showScreen('login')">← 返回</button>
   </div>
 </section>
@@ -781,7 +799,55 @@ function showScreen(id) {
 }
 
 /* ==========================
-   小孩代辦登入
+   帳號庫工具
+   sc_elder_accounts: { [name]: {name, age, address, phone} }
+========================== */
+function getAccounts() { return lsGet('sc_elder_accounts') || {}; }
+function saveAccounts(obj) { lsSet('sc_elder_accounts', obj); }
+
+/* ==========================
+   老人自行登入（只輸入姓名，查帳號庫）
+========================== */
+function elderLogin() {
+  var name = document.getElementById('elderLoginName').value.trim();
+  var errEl = document.getElementById('elderLoginError');
+  errEl.style.display = 'none';
+  if (!name) { alert('請輸入姓名。'); return; }
+  var accounts = getAccounts();
+  if (!accounts[name]) {
+    errEl.style.display = 'block';
+    return;
+  }
+  var u = accounts[name];
+  doSetUser(u.name, u.age, u.address, u.phone);
+  showScreen('home');
+}
+
+/* ==========================
+   老人自行註冊（填完整資料，存入帳號庫）
+========================== */
+function elderRegister() {
+  var name    = document.getElementById('regName').value.trim();
+  var age     = document.getElementById('regAge').value.trim();
+  var address = document.getElementById('regAddress').value.trim();
+  var phone   = document.getElementById('regPhone').value.trim();
+  var errEl   = document.getElementById('elderRegError');
+  errEl.style.display = 'none';
+  if (!name || !age || !address || !phone) { alert('請把所有資料填寫完整。'); return; }
+  var accounts = getAccounts();
+  if (accounts[name]) {
+    errEl.textContent = '此姓名已經註冊過了，請直接登入。';
+    errEl.style.display = 'block';
+    return;
+  }
+  accounts[name] = { name: name, age: age, address: address, phone: phone };
+  saveAccounts(accounts);
+  doSetUser(name, age, address, phone);
+  showScreen('home');
+}
+
+/* ==========================
+   小孩代辦（建立或更新帳號，直接登入）
 ========================== */
 function saveChildProfile() {
   var name    = document.getElementById('childName').value.trim();
@@ -789,19 +855,10 @@ function saveChildProfile() {
   var address = document.getElementById('childAddress').value.trim();
   var phone   = document.getElementById('childPhone').value.trim();
   if (!name || !age || !address || !phone) { alert('請把資料填寫完整。'); return; }
-  doSetUser(name, age, address, phone);
-  showScreen('home');
-}
-
-/* ==========================
-   老人自行登入（依姓名查找已存資料，否則新建）
-========================== */
-function elderLogin() {
-  var name    = document.getElementById('elderName').value.trim();
-  var age     = document.getElementById('elderAge').value.trim();
-  var address = document.getElementById('elderAddress').value.trim();
-  var phone   = document.getElementById('elderPhone').value.trim();
-  if (!name || !age || !address || !phone) { alert('請把姓名、年紀、地址和電話填寫完整。'); return; }
+  // 寫入或更新帳號庫
+  var accounts = getAccounts();
+  accounts[name] = { name: name, age: age, address: address, phone: phone };
+  saveAccounts(accounts);
   doSetUser(name, age, address, phone);
   showScreen('home');
 }
@@ -1008,11 +1065,8 @@ function submitRating() {
     document.getElementById('showAddress').textContent = saved.address;
     document.getElementById('showPhone').textContent   = saved.phone;
     document.getElementById('hello').textContent       = '您好，' + saved.name;
-    // 預填登入欄位
-    document.getElementById('elderName').value    = saved.name;
-    document.getElementById('elderAge').value     = saved.age;
-    document.getElementById('elderAddress').value = saved.address;
-    document.getElementById('elderPhone').value   = saved.phone;
+    // 預填登入姓名欄位
+    document.getElementById('elderLoginName').value = saved.name;
   }
 })();
 </script>
