@@ -516,6 +516,77 @@ input:focus {
   color: var(--text);
 }
 
+/* =========================
+   志工資料卡片（接單後顯示）
+========================= */
+.vol-card {
+  background: var(--lav-light);
+  border: 1.5px solid var(--lav);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.vol-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--lav);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.vol-info {
+  flex: 1;
+}
+
+.vol-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.vol-meta {
+  font-size: 16px;
+  color: var(--sub);
+  margin-top: 3px;
+}
+
+.vol-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  background: var(--card);
+  border: 1.5px solid var(--lav);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--lav);
+  text-decoration: none;
+}
+
+.vol-phone:hover {
+  background: var(--lav);
+  color: #fff;
+}
+
+.vol-rating {
+  font-size: 15px;
+  color: var(--rose);
+  margin-top: 6px;
+  font-weight: 700;
+}
+
 /* 返回首頁按鈕 */
 .home-link {
   display: inline-block;
@@ -981,6 +1052,27 @@ function submitRequest(need, category, emoji) {
 /* ==========================
    顯示「我的需求」列表
 ========================== */
+/* 產生志工資料卡片 HTML */
+function buildVolCard(t) {
+  if (!t.volunteer) return '';
+  var initial = t.volunteer.charAt(0);
+  var phoneHtml = t.volunteerPhone
+    ? '<a class="vol-phone" href="tel:' + t.volunteerPhone + '">📞 ' + t.volunteerPhone + '</a>'
+    : '<span style="font-size:15px;color:var(--sub);">（電話未設定）</span>';
+  var ageHtml = t.volunteerAge ? t.volunteerAge + ' 歲・' : '';
+  var ratings = typeof t.volunteerGoodRatings === 'number' ? t.volunteerGoodRatings : 0;
+  var ratingHtml = '<div class="vol-rating">❤️ 好評 ' + ratings + ' 次</div>';
+  return '<div class="vol-card">'
+    + '<div class="vol-avatar">' + initial + '</div>'
+    + '<div class="vol-info">'
+    + '<div class="vol-name">👤 ' + t.volunteer + '</div>'
+    + '<div class="vol-meta">' + ageHtml + '銀伴志工</div>'
+    + ratingHtml
+    + phoneHtml
+    + '</div>'
+    + '</div>';
+}
+
 function renderMyRequests() {
   if (!currentElderUser) return;
   var tasks = lsGet('sc_tasks') || [];
@@ -993,16 +1085,18 @@ function renderMyRequests() {
   var statusLabel = { open:'等待志工接單', taken:'志工已接單 ✓', done:'已完成 🎉' };
   var statusColor = { open:'var(--sub)', taken:'var(--rose)', done:'var(--mint)' };
   el.innerHTML = mine.slice().reverse().map(function(t){
-    return '<div style="padding:14px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;">'
+    return '<div style="padding:14px 0;border-bottom:1px solid var(--border);">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">'
       + '<div style="flex:1">'
       + '<div style="font-size:18px;font-weight:700;color:var(--text);">' + t.need + '</div>'
       + '<div style="font-size:15px;color:var(--sub);margin-top:4px;">' + t.date + ' ' + t.time + '・' + t.category + '</div>'
-      + (t.volunteer ? '<div style="font-size:15px;color:var(--rose);margin-top:2px;">志工：' + t.volunteer + '</div>' : '')
       + '</div>'
       + '<div style="font-weight:700;font-size:15px;color:' + statusColor[t.status] + ';white-space:nowrap;">' + (statusLabel[t.status]||t.status) + '</div>'
       + (t.status==='taken'
           ? '<button onclick="markDone(\'' + t.id + '\')" style="margin-left:10px;background:var(--mint);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:15px;font-weight:700;cursor:pointer;">✓ 確認完成</button>'
           : '')
+      + '</div>'
+      + (t.status==='taken' ? buildVolCard(t) : '')
       + '</div>';
   }).join('');
 }
@@ -1029,7 +1123,7 @@ function renderActiveTask() {
   info.innerHTML = ongoing.map(function(t){
     return '<div style="padding:12px 0;border-bottom:1px solid var(--border);">'
       + '<div style="font-size:20px;font-weight:700;color:var(--text);">' + t.need + '</div>'
-      + '<div style="font-size:17px;color:var(--rose);margin-top:6px;">志工 ' + (t.volunteer||'（確認中）') + ' 正在前來協助</div>'
+      + buildVolCard(t)
       + '<button onclick="markDone(\'' + t.id + '\')" style="margin-top:14px;background:var(--mint);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:18px;font-weight:700;cursor:pointer;width:100%;">✓ 志工已完成協助，前往評分</button>'
       + '</div>';
   }).join('');

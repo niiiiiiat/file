@@ -1101,9 +1101,17 @@ function confirmAccept(){
   if(!t)return;
   var my=getMyTasks();
   if(my.find(function(m){return m.taskId===pendingId;})){toast('你已經接了這個任務囉！');return;}
-  // 更新 sc_tasks：標記為 taken，寫入志工姓名
+  // 更新 sc_tasks：標記為 taken，寫入志工完整資料
   t.status='taken';
   t.volunteer=curUser?curUser.name:'志工';
+  if(curUser){
+    t.volunteerPhone=curUser.phone||'';
+    t.volunteerAge=curUser.age||'';
+    // 計算該志工的好評數（sc_tasks 中所有他接的、有 rating 的任務）
+    var volName=curUser.name;
+    var goodRatings=all.filter(function(x){return x.volunteer===volName&&x.rating&&x.rating>=4;}).length;
+    t.volunteerGoodRatings=goodRatings;
+  }
   saveTasks(all);
   // 記入自己的任務
   var now=Date.now();
