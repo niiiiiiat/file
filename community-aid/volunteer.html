@@ -248,6 +248,8 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
 }
 .mk:hover,.mk.active{transform:scale(1.18);box-shadow:0 4px 16px rgba(217,71,94,.35);border-color:var(--rose-h);}
 .mk.urgent{border-color:#c0392b;background:#fff0ee;}
+.mk-vol{background:#e8f4fd;border-color:#3b82d4;}
+.mk-vol:hover,.mk-vol.active{box-shadow:0 4px 16px rgba(59,130,212,.35);border-color:#1769aa;}
 
 /* no results on map */
 .no-r{text-align:center;color:var(--sub);padding:56px 20px;font-size:14px;}
@@ -838,18 +840,39 @@ function selCat(c){curCat=c;buildChips();renderMap();}
 var elderMapInstance=null;
 var mapMarkers=[];
 var activeMarkerId=null;
+var volMarkerLayer=null;  // 志工自己的 marker
 
-/* 取任務對應的地圖座標（老人送出需求時 area 是地址字串，先解析城市關鍵字推估） */
+/* ── 地址字串 → 推估座標 ── */
 function getCoords(t){
-  // 先查精確座標表
   if(AREA_COORDS[t.area]) return AREA_COORDS[t.area];
-  // 嘗試模糊比對
   var keys=Object.keys(AREA_COORDS);
   for(var i=0;i<keys.length;i++){
     if(t.area&&t.area.indexOf(keys[i])>=0) return AREA_COORDS[keys[i]];
   }
-  // 找不到：用高雄市中心並加小偏移避免重疊
   return [22.6328+Math.random()*0.06-0.03, 120.3016+Math.random()*0.06-0.03];
+}
+
+/* 從地址字串推估座標（志工用） */
+function addrToCoords(addr){
+  if(!addr) return null;
+  var keys=Object.keys(AREA_COORDS);
+  for(var i=0;i<keys.length;i++){
+    if(addr.indexOf(keys[i])>=0) return AREA_COORDS[keys[i]];
+  }
+  return null;
+}
+
+/* Haversine 距離計算（km），傳回字串如「1.2 km」*/
+function calcDist(lat1,lng1,lat2,lng2){
+  var R=6371;
+  var dLat=(lat2-lat1)*Math.PI/180;
+  var dLng=(lng2-lng1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)
+       +Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)
+       *Math.sin(dLng/2)*Math.sin(dLng/2);
+  var c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  var d=R*c;
+  return d<1?(Math.round(d*1000)+'m'):(d.toFixed(1)+'km');
 }
 
 function renderMap(){
@@ -865,13 +888,23 @@ function renderMap(){
       attribution:'© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
       maxZoom:19
     }).addTo(elderMapInstance);
-    // 點地圖空白處關閉側邊欄
     elderMapInstance.on('click',function(){closeMapSide();});
   }
 
-  // 清除舊 marker
+  // 清除舊老人 marker
   mapMarkers.forEach(function(m){elderMapInstance.removeLayer(m.layer);});
   mapMarkers=[];
+
+  // ── 志工自己的位置 marker ──
+  if(volMarkerLayer){elderMapInstance.removeLayer(volMarkerLayer);volMarkerLayer=null;}
+  var volCoords=curUser&&curUser.address?addrToCoords(curUser.address):null;
+  if(volCoords){
+    var volEl='<div class="mk mk-vol" title="我的位置">🧑</div>';
+    var volIcon=L.divIcon({html:volEl,className:'',iconSize:[42,42],iconAnchor:[21,21]});
+    volMarkerLayer=L.marker(volCoords,{icon:volIcon,zIndexOffset:1000}).addTo(elderMapInstance);
+    volMarkerLayer.bindTooltip('<b>我的位置</b><br><span style="font-size:11px">'+curUser.address+'</span>',
+      {direction:'top',offset:[0,-24],className:'mk-tooltip',permanent:false});
+  }
 
   if(!f.length){
     document.getElementById('mapSideBody').innerHTML='<div class="no-r">🌸 此分類目前沒有等待中的需求</div>';
@@ -890,48 +923,56 @@ function renderMap(){
     var icon=L.divIcon({html:el.outerHTML,className:'',iconSize:[42,42],iconAnchor:[21,21]});
     var marker=L.marker(coords,{icon:icon}).addTo(elderMapInstance);
 
-    // 滑過顯示小 tooltip
+    // 距離字串
+    var distStr='';
+    if(volCoords) distStr=' · 距您 <b>'+calcDist(volCoords[0],volCoords[1],coords[0],coords[1])+'</b>';
+
     marker.bindTooltip(
-      '<b>'+t.name+'</b><br><span style="font-size:11px">'+t.need+'</span>',
+      '<b>'+t.name+'</b>'+distStr+'<br><span style="font-size:11px">'+t.need+'</span>',
       {direction:'top',offset:[0,-24],className:'mk-tooltip'}
     );
 
-    // 點擊開啟側邊詳情
     marker.on('click',function(e){
       L.DomEvent.stopPropagation(e);
-      showMapSide(t.id);
-      // 更新 active 樣式
+      showMapSide(t.id, volCoords);
       mapMarkers.forEach(function(m2){
-        m2.layer.getElement()&&m2.layer.getElement().querySelector&&
-        m2.layer.getElement().querySelector('.mk')&&
-        m2.layer.getElement().querySelector('.mk').classList.remove('active');
+        var el2=m2.layer.getElement();
+        if(el2){var mk2=el2.querySelector('.mk');if(mk2)mk2.classList.remove('active');}
       });
-      marker.getElement()&&marker.getElement().querySelector&&
-      marker.getElement().querySelector('.mk')&&
-      marker.getElement().querySelector('.mk').classList.add('active');
+      var el3=marker.getElement();
+      if(el3){var mk3=el3.querySelector('.mk');if(mk3)mk3.classList.add('active');}
       activeMarkerId=t.id;
     });
 
-    mapMarkers.push({id:t.id,layer:marker});
+    mapMarkers.push({id:t.id,layer:marker,coords:coords});
   });
 
-  // 自動縮放到所有 marker 範圍
-  if(mapMarkers.length){
-    var group=L.featureGroup(mapMarkers.map(function(m){return m.layer;}));
+  // 自動縮放：包含志工位置
+  var allLayers=mapMarkers.map(function(m){return m.layer;});
+  if(volMarkerLayer) allLayers.push(volMarkerLayer);
+  if(allLayers.length){
+    var group=L.featureGroup(allLayers);
     elderMapInstance.fitBounds(group.getBounds().pad(0.3));
   }
 
-  // 地圖大小重算（切換頁面可能造成尺寸異常）
   setTimeout(function(){elderMapInstance.invalidateSize();},120);
 }
 
-function showMapSide(taskId){
+function showMapSide(taskId, volCoords){
   var all=getTasks();
   var t=all.find(function(x){return x.id===taskId;});
   if(!t)return;
   var my=getMyTasks();
   var m=my.find(function(x){return x.taskId===taskId;});
   var alreadyTaken=!!m;
+
+  // 計算距離
+  var tCoords=getCoords(t);
+  var distHtml='';
+  if(volCoords){
+    var d=calcDist(volCoords[0],volCoords[1],tCoords[0],tCoords[1]);
+    distHtml='<div class="map-side-row"><b>📏 距離</b><span style="color:var(--rose);font-weight:800">'+d+'</span></div>';
+  }
 
   document.getElementById('mapSideBody').innerHTML=
     '<div class="map-side-emo">'+t.emoji+'</div>'
@@ -941,6 +982,7 @@ function showMapSide(taskId){
     +'<div class="map-side-rows">'
     +'<div class="map-side-row"><b>🙏 需求</b>'+t.need+'</div>'
     +'<div class="map-side-row"><b>📍 地點</b>'+t.area+'</div>'
+    +distHtml
     +'<div class="map-side-row"><b>📅 日期</b>'+t.date+' '+t.time+'</div>'
     +'<div class="map-side-row"><b>⏱ 時長</b>'+t.duration+'</div>'
     +(t.elderPhone?'<div class="map-side-row"><b>📞 電話</b>'+t.elderPhone+'</div>':'')
@@ -1158,14 +1200,18 @@ function doLogin(){
 }
 
 function doRegister(){
+  var nameReg=/^[\u4e00-\u9fa5a-zA-Z]{3,4}$/;
+  var phoneReg=/^09\d{8}$/;
   var n=document.getElementById('reg-name').value.trim();
   var chk=document.querySelector('input[name="rg"]:checked');
   var g=chk?chk.value:'其他';
   var a=document.getElementById('reg-age').value.trim();
-  var p=document.getElementById('reg-phone').value.trim();
+  var p=document.getElementById('reg-phone').value.trim().replace(/-/g,'');
   var addr=document.getElementById('reg-address').value.trim();
   if(!n){toast('請輸入姓名');return;}
-  if(!a||isNaN(a)){toast('請輸入有效年齡');return;}
+  if(!nameReg.test(n)){toast('姓名請輸入 3～4 個中文或英文字');return;}
+  if(!a||isNaN(a)||parseInt(a)<18||parseInt(a)>99){toast('請輸入有效年齡（18～99）');return;}
+  if(p&&!phoneReg.test(p)){toast('電話格式錯誤，請輸入 09 開頭共 10 碼數字');return;}
   loginAs({name:n,gender:g,age:parseInt(a),phone:p,address:addr});
 }
 

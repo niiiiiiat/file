@@ -827,13 +827,17 @@ function elderLogin() {
    老人自行註冊（填完整資料，存入帳號庫）
 ========================== */
 function elderRegister() {
+  var nameReg  = /^[\u4e00-\u9fa5a-zA-Z]{3,4}$/;
+  var phoneReg = /^09\d{8}$/;
   var name    = document.getElementById('regName').value.trim();
   var age     = document.getElementById('regAge').value.trim();
   var address = document.getElementById('regAddress').value.trim();
-  var phone   = document.getElementById('regPhone').value.trim();
+  var phone   = document.getElementById('regPhone').value.trim().replace(/-/g, '');
   var errEl   = document.getElementById('elderRegError');
   errEl.style.display = 'none';
   if (!name || !age || !address || !phone) { alert('請把所有資料填寫完整。'); return; }
+  if (!nameReg.test(name))  { alert('姓名請輸入 3～4 個中文或英文字。'); return; }
+  if (!phoneReg.test(phone)) { alert('電話格式錯誤，請輸入 09 開頭共 10 碼數字（例如：0912345678）。'); return; }
   var accounts = getAccounts();
   if (accounts[name]) {
     errEl.textContent = '此姓名已經註冊過了，請直接登入。';
@@ -850,11 +854,15 @@ function elderRegister() {
    小孩代辦（建立或更新帳號，直接登入）
 ========================== */
 function saveChildProfile() {
+  var nameReg  = /^[\u4e00-\u9fa5a-zA-Z]{3,4}$/;
+  var phoneReg = /^09\d{8}$/;
   var name    = document.getElementById('childName').value.trim();
   var age     = document.getElementById('childAge').value.trim();
   var address = document.getElementById('childAddress').value.trim();
-  var phone   = document.getElementById('childPhone').value.trim();
+  var phone   = document.getElementById('childPhone').value.trim().replace(/-/g, '');
   if (!name || !age || !address || !phone) { alert('請把資料填寫完整。'); return; }
+  if (!nameReg.test(name))  { alert('姓名請輸入 3～4 個中文或英文字。'); return; }
+  if (!phoneReg.test(phone)) { alert('電話格式錯誤，請輸入 09 開頭共 10 碼數字（例如：0912345678）。'); return; }
   // 寫入或更新帳號庫
   var accounts = getAccounts();
   accounts[name] = { name: name, age: age, address: address, phone: phone };
