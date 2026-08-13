@@ -506,6 +506,7 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
         <label>姓名</label>
         <input type="text" id="login-name" placeholder="請輸入您的姓名"/>
       </div>
+      <div id="loginError" style="color:#d9475e;font-size:12px;margin:-6px 0 10px;display:none;font-weight:700;">找不到此帳號，請先點「註冊」建立帳號。</div>
       <button class="btn-auth" onclick="doLogin()">開始志工旅程 ❤️</button>
       <div class="ahint">還沒有帳號？點上方「註冊」建立帳號</div>
     </div>
@@ -534,6 +535,7 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
         <label>住址</label>
         <input type="text" id="reg-address" placeholder="例：高雄市左營區XX路XX號"/>
       </div>
+      <div id="registerError" style="color:#d9475e;font-size:12px;margin:-6px 0 10px;display:none;font-weight:700;"></div>
       <button class="btn-auth" onclick="doRegister()">加入銀伴大家庭 🌸</button>
       <div class="ahint">已有帳號？點上方「登入」</div>
     </div>
@@ -1187,21 +1189,27 @@ function switchAuthTab(tab){
   document.getElementById('panel-register').classList.toggle('active',tab==='register');
 }
 
+function getVolAccounts(){return lsGet('sc_vol_accounts')||{};}
+function saveVolAccounts(obj){lsSet('sc_vol_accounts',obj);}
+
 function doLogin(){
+  var errEl=document.getElementById('loginError');
+  errEl.style.display='none';
   var n=document.getElementById('login-name').value.trim();
   if(!n){toast('請輸入姓名');return;}
-  // 查找已存在的志工資料
-  var saved=lsGet('sc_vol_user');
-  if(saved&&saved.name===n){
-    loginAs(saved);
-  } else {
-    loginAs({name:n,gender:'',age:'',phone:'',address:''});
+  var accounts=getVolAccounts();
+  if(!accounts[n]){
+    errEl.style.display='block';
+    return;
   }
+  loginAs(accounts[n]);
 }
 
 function doRegister(){
-  var nameReg=/^[\u4e00-\u9fa5a-zA-Z]{3,4}$/;
+  var nameReg=/^[\u4e00-\u9fa5a-zA-Z]{2,4}$/;
   var phoneReg=/^09\d{8}$/;
+  var errEl=document.getElementById('registerError');
+  errEl.style.display='none';
   var n=document.getElementById('reg-name').value.trim();
   var chk=document.querySelector('input[name="rg"]:checked');
   var g=chk?chk.value:'其他';
@@ -1212,7 +1220,16 @@ function doRegister(){
   if(!nameReg.test(n)){toast('姓名請輸入 2～4 個中文或英文字');return;}
   if(!a||isNaN(a)||parseInt(a)<18||parseInt(a)>99){toast('請輸入有效年齡（18～99）');return;}
   if(p&&!phoneReg.test(p)){toast('電話格式錯誤，請輸入 09 開頭共 10 碼數字');return;}
-  loginAs({name:n,gender:g,age:parseInt(a),phone:p,address:addr});
+  var accounts=getVolAccounts();
+  if(accounts[n]){
+    errEl.textContent='此姓名已經註冊過了，請直接登入。';
+    errEl.style.display='block';
+    return;
+  }
+  var u={name:n,gender:g,age:parseInt(a),phone:p,address:addr};
+  accounts[n]=u;
+  saveVolAccounts(accounts);
+  loginAs(u);
 }
 
 function loginAs(u){
