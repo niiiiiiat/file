@@ -1,894 +1,491 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>老人救助平台</title>
-
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>銀伴 Silver Companion</title>
 <style>
-* {
-  box-sizing: border-box;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --rose: #d9475e;
+  --rose-h: #b83650;
+  --rose-light: #fbeaed;
+  --rose-xlight: #fdf5f6;
+  --mint: #3daa7e;
+  --mint-light: #eaf7f2;
+  --lav: #8b72cc;
+  --lav-light: #f0ebfa;
+  --bg: #f9f9f9;
+  --card: #ffffff;
+  --border: #e8e4e0;
+  --border2: #d8d3ce;
+  --text: #1e1a17;
+  --sub: #7a706b;
+  --xs: #b0a8a3;
+  --sidebar: 240px;
+  --sh: 0 1px 8px rgba(0,0,0,.06);
+  --shm: 0 3px 16px rgba(0,0,0,.1);
+  --shl: 0 8px 32px rgba(0,0,0,.14);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
-body {
-  margin: 0;
-  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-  background: #fff8ef;
-  color: #333;
-}
-
-button, input {
-  font: inherit;
-}
-
-.app {
-  max-width: 900px;
-  min-height: 100vh;
-  margin: auto;
-  background: white;
-}
-
-/* =========================
-   頁首
-========================= */
-header {
-  background: #f0443e;
-  color: white;
-  padding: 22px 28px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 30px;
-}
-
-header small {
-  display: block;
-  font-size: 17px;
-  margin-top: 4px;
-}
-
-/* =========================
-   一般頁面
-========================= */
-.screen {
-  padding: 34px 28px;
-}
-
-.hidden {
-  display: none !important;
-}
-
-h2 {
-  font-size: 40px;
-  margin: 10px 0;
-}
-
-h3 {
-  font-size: 28px;
-}
-
-p, label {
-  font-size: 22px;
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
   line-height: 1.6;
 }
 
-/* =========================
-   登入選項
-========================= */
-.choice {
-  width: 100%;
-  margin: 18px 0;
-  padding: 28px;
-  border: 3px solid #ffd08a;
-  border-radius: 24px;
-  background: #fffaf0;
-  text-align: left;
-  cursor: pointer;
+#appShell { display: flex; height: 100vh; position: relative; z-index: 1; }
+
+.sidebar {
+  width: var(--sidebar); flex-shrink: 0; background: var(--card);
+  border-right: 1.5px solid var(--border); display: flex; flex-direction: column;
+  position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; transition: transform .3s;
 }
+.sb-logo { padding: 24px 22px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.sb-logo .lheart { font-size: 24px; animation: hb 2.5s ease-in-out infinite; }
+@keyframes hb { 0%,100%{transform:scale(1)} 15%{transform:scale(1.3)} 30%{transform:scale(1)} 45%{transform:scale(1.15)} 70%{transform:scale(1)} }
+.sb-logo .ltxt { font-size: 16px; font-weight: 900; color: var(--rose); letter-spacing: .3px; }
+.sb-logo .lsub { font-size: 9px; color: var(--xs); letter-spacing: .6px; display: block; margin-top: 1px; }
 
-.choice:hover {
-  box-shadow: 0 5px 15px #ddd;
+.sb-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+.sb-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; color: var(--sub); cursor: pointer; transition: all .2s; text-decoration: none; }
+.sb-item .si-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.sb-item:hover { background: var(--rose-xlight); color: var(--rose); }
+.sb-item.active { background: var(--rose-light); color: var(--rose); }
+
+.sb-bottom { padding: 16px 12px; border-top: 1px solid var(--border); }
+.sb-user { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; }
+.sb-avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; background: var(--rose); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; }
+.sb-uname { font-size: 13px; font-weight: 800; color: var(--text); }
+.sb-urole { font-size: 10px; color: var(--xs); letter-spacing: .4px; }
+.sb-logout { margin-top: 6px; width: 100%; padding: 9px; border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--sub); background: none; border: 1.5px solid var(--border2); cursor: pointer; transition: all .2s; }
+.sb-logout:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-xlight); }
+
+.main { margin-left: var(--sidebar); flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.topbar { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+.topbar-title { font-size: 17px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.content { padding: 28px 32px 60px; flex: 1; max-width: 900px; }
+
+.page { display: none; animation: fadeIn .25s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.card { background: var(--card); border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--sh); padding: 24px; margin-bottom: 20px; }
+.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.btn-card { background: #f8f9fa; border: 2px solid var(--border); border-radius: 12px; padding: 20px; cursor: pointer; text-align: center; transition: all .2s; }
+.btn-card:hover { background: var(--rose-xlight); border-color: var(--rose); }
+.btn-card .icon { font-size: 36px; margin-bottom: 8px; }
+.btn-card h3 { margin-bottom: 4px; color: var(--text); }
+.btn-card p { font-size: 12px; color: var(--sub); }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: var(--text); font-size: 13px; }
+.form-group input { width: 100%; padding: 12px; border: 1.5px solid var(--border2); border-radius: 8px; font-size: 14px; outline: none; transition: border-color .2s; }
+.form-group input:focus { border-color: var(--rose); }
+
+.btn-primary { width: 100%; padding: 12px; background: var(--rose); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 800; cursor: pointer; transition: background .2s; margin-bottom: 8px; }
+.btn-primary:hover { background: var(--rose-h); }
+.btn-secondary { width: 100%; padding: 10px; background: var(--bg); color: var(--sub); border: 1.5px solid var(--border2); border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-secondary:hover { background: var(--border); }
+
+.btn-sos { width: 100%; padding: 22px; background: var(--rose); color: #fff; border: none; border-radius: 14px; font-size: 22px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 16px rgba(217,71,94,.3); transition: transform .1s; margin: 16px 0; }
+.btn-sos:active { transform: scale(.98); }
+
+.profile-card { background: var(--rose-xlight); border-radius: 10px; padding: 16px; margin-top: 16px; }
+.profile-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+.star-rating { font-size: 36px; color: var(--border2); text-align: center; margin: 16px 0; cursor: pointer; }
+.star-rating span.active { color: #ffb300; }
+
+/* 語音按鈕錄音狀態動態 */
+.listening {
+  animation: pulse 1.5s infinite;
+  border-color: var(--rose) !important;
+  color: var(--rose) !important;
 }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(217,71,94,0.4); } 70% { box-shadow: 0 0 0 10px rgba(217,71,94,0); } 100% { box-shadow: 0 0 0 0 rgba(217,71,94,0); } }
 
-.choice strong {
-  display: block;
-  font-size: 30px;
-}
-
-.choice span {
-  font-size: 20px;
-}
-
-.icon {
-  font-size: 45px;
-  margin-right: 14px;
-}
-
-/* =========================
-   表單
-========================= */
-.form {
-  max-width: 650px;
-  margin: 20px auto;
-}
-
-input {
-  width: 100%;
-  padding: 20px;
-  margin: 8px 0 20px;
-  border: 2px solid #bbb;
-  border-radius: 14px;
-  font-size: 24px;
-}
-
-/* =========================
-   按鈕
-========================= */
-.primary,
-.danger,
-.secondary,
-.voice-btn,
-.confirm-btn,
-.accept-btn {
-  border: 0;
-  border-radius: 16px;
-  padding: 20px 28px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 25px;
-}
-
-.primary {
-  background: #1769aa;
-  color: white;
-  width: 100%;
-}
-
-.secondary {
-  background: #eee;
-  color: #333;
-}
-
-.danger {
-  background: #ef3f35;
-  color: white;
-  width: 100%;
-  font-size: 38px;
-  padding: 28px;
-  margin: 20px 0;
-}
-
-.danger:active {
-  transform: scale(.98);
-}
-
-.back {
-  margin-top: 15px;
-}
-
-/* =========================
-   卡片與資訊
-========================= */
-.card {
-  background: #fffaf4;
-  border: 2px solid #f0d8bd;
-  border-radius: 20px;
-  padding: 25px;
-  margin: 20px 0;
-}
-
-.info-row {
-  display: flex;
-  gap: 20px;
-  padding: 16px 0;
-  border-bottom: 1px solid #ddd;
-  font-size: 24px;
-}
-
-.info-row:last-child {
-  border-bottom: 0;
-}
-
-.info-row b {
-  min-width: 100px;
-}
-
-.notice {
-  background: #fff3cf;
-  border-radius: 18px;
-  padding: 20px;
-  font-size: 20px;
-}
-
-.success {
-  background: #e9f7e8;
-  border: 2px solid #83bd7d;
-  border-radius: 18px;
-  padding: 20px;
-  font-size: 23px;
-  margin-top: 15px;
-}
-
-/* =========================
-   語音求救區域
-========================= */
-.voice-box {
-  background: #fff8ed;
-  border: 3px solid #ffd18a;
-  border-radius: 24px;
-  padding: 25px;
-  margin: 20px 0;
-  text-align: center;
-}
-
-.voice-action-group {
-  display: flex;
-  gap: 15px;
-  margin-top: 15px;
-}
-
-.voice-btn {
-  background: #1769aa;
-  color: white;
-  flex: 2;
-  font-size: 26px;
-}
-
-.voice-btn.recording {
-  background: #d62828;
-  animation: pulse 1s infinite;
-}
-
-.confirm-btn {
-  background: #2e7d32;
-  color: white;
-  flex: 1;
-  font-size: 26px;
-  white-space: nowrap;
-}
-
-@keyframes pulse {
-  50% {
-    transform: scale(.98);
-    opacity: .8;
-  }
-}
-
-.transcript {
-  min-height: 100px;
-  background: white;
-  border: 2px solid #ddd;
-  border-radius: 15px;
-  padding: 18px;
-  text-align: left;
-  font-size: 22px;
-  margin-top: 18px;
-}
-
-.voice-hint {
-  font-size: 18px;
-  color: #666;
-}
-
-/* =========================
-   年輕人推薦
-========================= */
-.match {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  background: white;
-  border: 2px solid #e2e2e2;
-  border-radius: 18px;
-  padding: 18px;
-  margin: 14px 0;
-}
-
-.avatar {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  background: #e8f1ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 38px;
-  flex-shrink: 0;
-}
-
-.match-info {
-  flex: 1;
-}
-
-.match-info strong {
-  font-size: 23px;
-}
-
-.match-info div {
-  font-size: 18px;
-  margin-top: 4px;
-}
-
-.accept-btn {
-  background: #f28c28;
-  color: white;
-  padding: 13px 18px;
-  font-size: 20px;
-  white-space: nowrap;
-}
-
-.tag {
-  display: inline-block;
-  background: #e9f7e8;
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 16px;
-  margin-top: 5px;
-}
-
-/* =========================
-   常見需求
-========================= */
-.task {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 13px 0;
-  font-size: 21px;
-  border-bottom: 1px solid #eee;
-}
-
-.task:last-child {
-  border-bottom: 0;
-}
-
-/* =========================
-   完成協助與評分
-========================= */
-.finish-card {
-  background: #eef9ed;
-  border: 3px solid #8acb82;
-  border-radius: 25px;
-  padding: 30px;
-  text-align: center;
-  margin: 25px 0;
-}
-
-.finish-icon {
-  font-size: 65px;
-}
-
-.finish-card h2 {
-  color: #26752c;
-  font-size: 34px;
-}
-
-.rating-box {
-  background: white;
-  border-radius: 20px;
-  padding: 20px;
-  margin-top: 20px;
-}
-
-.hearts {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin: 20px 0;
-}
-
-.heart {
-  border: none;
-  background: transparent;
-  font-size: 52px;
-  color: #ddd;
-  cursor: pointer;
-  padding: 3px;
-}
-
-.heart.active {
-  color: #f0445a;
-}
-
-.rating-text {
-  font-size: 25px;
-  font-weight: bold;
-  text-align: center;
-  min-height: 40px;
-}
-
-.submit-rating {
-  background: #f0445a;
-  color: white;
-  width: 100%;
-  border: none;
-  border-radius: 15px;
-  padding: 18px;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.rating-success {
-  background: #e9f7e8;
-  border: 2px solid #83bd7d;
-  border-radius: 15px;
-  padding: 20px;
-  font-size: 22px;
-  margin-top: 20px;
-  text-align: center;
-}
-
-/* RWD 響應式 */
-@media (max-width: 600px) {
-  h2 {
-    font-size: 32px;
-  }
-
-  header h1 {
-    font-size: 25px;
-  }
-
-  .screen {
-    padding: 24px 18px;
-  }
-
-  .voice-action-group {
-    flex-direction: column;
-  }
-
-  .voice-btn, .confirm-btn {
-    width: 100%;
-  }
-
-  .danger {
-    font-size: 30px;
-  }
-
-  .match {
-    align-items: flex-start;
-  }
-
-  .accept-btn {
-    font-size: 18px;
-    padding: 10px;
-  }
-
-  .heart {
-    font-size: 43px;
-  }
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .main { margin-left: 0; }
+  .mode-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
-
 <body>
 
-<div class="app">
-
-  <!-- =========================
-       頁首
-  ========================= -->
-  <header>
-    <div>
-      <h1>♡ 老人救助平台</h1>
-      <small>關懷老人，即時救助</small>
-    </div>
-    <button class="secondary hidden" id="logoutBtn" onclick="showScreen('login')">登出</button>
-  </header>
-
-  <!-- =========================
-       身分驗證
-  ========================= -->
-  <section id="login" class="screen">
-    <h2>身分驗證</h2>
-    <p>請選擇登入方式</p>
-
-    <!-- 小孩代辦 -->
-    <button class="choice" onclick="showScreen('childLogin')">
-      <span class="icon">👨‍👩‍👧</span>
-      <strong>小孩代辦登入</strong>
-      <span>由子女或家人協助設定帳號，老人不需要自己記住帳號密碼</span>
-    </button>
-
-    <!-- 老人自行登入 -->
-    <button class="choice" style="border-color:#a8d58f" onclick="showScreen('elderLogin')">
-      <span class="icon">👴</span>
-      <strong>老人自行登入</strong>
-      <span>我已經有帳號，可以自己登入</span>
-    </button>
-
-    <div class="notice">
-      <strong>還沒有帳號嗎？</strong><br>
-      請由您的子女或家人協助申請帳號。
-    </div>
-  </section>
-
-  <!-- =========================
-       小孩代辦
-  ========================= -->
-  <section id="childLogin" class="screen hidden">
-    <div class="form">
-      <h2>小孩代辦設定</h2>
-      <p>請由家人協助填寫長輩資料。</p>
-
-      <label>老人姓名</label>
-      <input id="childName" placeholder="例如：王阿姨">
-
-      <label>年紀</label>
-      <input id="childAge" type="number" placeholder="例如：72">
-
-      <label>住家地址</label>
-      <input id="childAddress" placeholder="例如：高雄市○○區○○路">
-
-      <label>家人聯絡電話</label>
-      <input id="childPhone" type="tel" placeholder="例如：0912-345-678">
-
-      <button class="primary" onclick="saveChildProfile()">完成設定並登入</button>
-      <button class="secondary back" onclick="showScreen('login')">← 返回</button>
-    </div>
-  </section>
-
-  <!-- =========================
-       老人自行登入
-  ========================= -->
-  <section id="elderLogin" class="screen hidden">
-    <div class="form">
-      <h2>老人自行登入</h2>
-
-      <label>姓名</label>
-      <input id="elderName" placeholder="請輸入您的姓名">
-
-      <label>年紀</label>
-      <input id="elderAge" type="number" placeholder="例如：75">
-
-      <label>住家地址</label>
-      <input id="elderAddress" placeholder="請輸入住家地址">
-
-      <label>電話</label>
-      <input id="elderPhone" type="tel" placeholder="例如：0912-345-678">
-
-      <button class="primary" onclick="elderLogin()">登入</button>
-      <button class="secondary back" onclick="showScreen('login')">← 返回</button>
-    </div>
-  </section>
-
-  <!-- =========================
-       老人首頁
-  ========================= -->
-  <section id="home" class="screen hidden">
-    <h2 id="hello">您好，長輩</h2>
-    <p>遇到需要幫忙的事情，可以用語音告訴我們。</p>
-
-    <!-- 語音求救 -->
-    <div class="voice-box">
-      <h3>🎙 用語音說明需要什麼幫忙</h3>
-      <p class="voice-hint">例如：「我的燈泡壞了，想請人幫忙更換。」</p>
-
-      <div id="transcript" class="transcript">您說的內容會顯示在這裡……</div>
-
-      <div class="voice-action-group">
-        <button id="voiceBtn" class="voice-btn" onclick="toggleVoice()">🎤 按一下開始說話</button>
-        <button class="confirm-btn" onclick="confirmVoiceHelp()">✓ 確定送出</button>
+<div id="appShell">
+  <aside class="sidebar">
+    <div class="sb-logo" onclick="switchPage('page-mode')">
+      <span class="lheart">❤️</span>
+      <div>
+        <span class="ltxt">銀伴 Silver</span>
+        <span class="lsub">長輩陪伴與救助平台</span>
       </div>
     </div>
-
-    <!-- 急救求救 -->
-    <button class="danger" onclick="sendHelp()">🆘 我要求救</button>
-
-    <!-- 求救/需求送出成功提示 -->
-    <div id="helpResult" class="success hidden">
-      ✓ 需求訊息已送出！<br>
-      您的語音需求已傳給附近的協助人員。
-    </div>
-
-    <!-- 年輕人推薦 -->
-    <div class="card">
-      <h3>🤝 為您推薦附近的年輕人</h3>
-
-      <div class="match">
-        <div class="avatar">👨</div>
-        <div class="match-info">
-          <strong>陳先生 ⭐ 4.9</strong>
-          <div>距離約 0.8 公里</div>
-          <span class="tag">居家小修繕</span>
-        </div>
-        <button class="accept-btn" onclick="chooseHelper('陳先生')">選擇</button>
-      </div>
-
-      <div class="match">
-        <div class="avatar">👩</div>
-        <div class="match-info">
-          <strong>林小姐 ⭐ 4.8</strong>
-          <div>距離約 1.2 公里</div>
-          <span class="tag">陪同採買</span>
-        </div>
-        <button class="accept-btn" onclick="chooseHelper('林小姐')">選擇</button>
-      </div>
-
-      <div class="match">
-        <div class="avatar">🧑</div>
-        <div class="match-info">
-          <strong>王先生 ⭐ 4.7</strong>
-          <div>距離約 1.5 公里</div>
-          <span class="tag">搬運、跑腿</span>
-        </div>
-        <button class="accept-btn" onclick="chooseHelper('王先生')">選擇</button>
-      </div>
-    </div>
-
-    <!-- 常見需求 -->
-    <div class="card">
-      <h3>📋 常見需要幫忙的事項</h3>
-      <div class="task"><span>💡 更換燈泡、簡單居家修繕</span></div>
-      <div class="task"><span>🛒 買菜、買生活用品</span></div>
-      <div class="task"><span>📦 協助領取物品或跑腿</span></div>
-      <div class="task"><span>🚶 陪同外出、散步</span></div>
-      <div class="task"><span>💪 搬運較重的物品</span></div>
-    </div>
-
-    <!-- 個人資料 -->
-    <div class="card">
-      <h3>👤 我的基本資料</h3>
-      <div class="info-row"><b>姓名</b><span id="showName">尚未設定</span></div>
-      <div class="info-row"><b>年紀</b><span id="showAge">尚未設定</span></div>
-      <div class="info-row"><b>地址</b><span id="showAddress">尚未設定</span></div>
-      <div class="info-row"><b>電話</b><span id="showPhone">尚未設定</span></div>
-    </div>
-
-    <!-- 模擬完成工作 -->
-    <div class="card">
-      <h3>⚙️ 協助狀態</h3>
-      <p>年輕人完成工作後，可以在這裡模擬「工作完成」。</p>
-      <button class="primary" onclick="finishHelp()">✓ 年輕人已完成工作</button>
-    </div>
-
-    <div class="notice">⚠️ 非緊急情況請不要使用求救按鈕。</div>
-    <button class="secondary back" onclick="showScreen('login')">登出</button>
-  </section>
-
-  <!-- =========================
-       完成工作＋評分頁面
-  ========================= -->
-  <section id="rating" class="screen hidden">
-    <div class="finish-card">
-      <div class="finish-icon">🎉</div>
-      <h2>協助已完成！</h2>
-      <p>服務人員已經完成這次的協助。</p>
-
-      <div class="rating-box">
-        <h3>❤️ 請幫這位年輕人評分</h3>
-        <p>您覺得這次的服務好嗎？</p>
-
-        <!-- 五顆愛心 -->
-        <div class="hearts" id="hearts">
-          <button class="heart" onclick="rateHeart(1)">♥</button>
-          <button class="heart" onclick="rateHeart(2)">♥</button>
-          <button class="heart" onclick="rateHeart(3)">♥</button>
-          <button class="heart" onclick="rateHeart(4)">♥</button>
-          <button class="heart" onclick="rateHeart(5)">♥</button>
-        </div>
-
-        <div id="ratingText" class="rating-text">請點選愛心評分</div>
-        <button class="submit-rating" onclick="submitRating()">送出我的評價</button>
-
-        <div id="ratingSuccess" class="rating-success hidden">
-          ❤️ 謝謝您的評價！<br>您的意見對我們非常重要。
+    <nav class="sb-nav">
+      <a class="sb-item active" id="nav-mode" onclick="switchPage('page-mode')">
+        <span class="si-icon">🔑</span>身分驗證
+      </a>
+      <a class="sb-item" id="nav-home" onclick="switchPage('page-home')">
+        <span class="si-icon">🏠</span>求救與求助主頁
+      </a>
+    </nav>
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-avatar" id="userAvatar">客</div>
+        <div>
+          <div class="sb-uname" id="userName">未登入</div>
+          <div class="sb-urole" id="userRole">請先驗證身分</div>
         </div>
       </div>
+      <button class="sb-logout" onclick="logout()">重新登入 / 登出</button>
     </div>
+  </aside>
 
-    <button class="secondary" onclick="showScreen('home')">← 回到首頁</button>
-  </section>
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title">
+        <span>♡</span> <span id="topbarTitle">身分驗證</span>
+      </div>
+    </header>
 
+    <div class="content">
+
+      <!-- MODE SELECT PAGE -->
+      <section id="page-mode" class="page active">
+        <div class="card">
+          <h2 style="text-align:center; margin-bottom: 6px;">身分驗證</h2>
+          <p style="text-align:center; color: var(--sub);">請選擇進入系統的登入方式</p>
+
+          <div class="mode-grid">
+            <div class="btn-card" onclick="switchPage('page-child')">
+              <div class="icon">👩‍👦</div>
+              <h3>小孩代辦登入</h3>
+              <p>由子女或家人協助設定長輩帳號與緊急聯絡電話</p>
+            </div>
+            <div class="btn-card" onclick="switchPage('page-elder')">
+              <div class="icon">👴</div>
+              <h3>老人自行登入</h3>
+              <p>由長輩親自輸入個人的姓名、電話與住址登入</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHILD FORM PAGE -->
+      <section id="page-child" class="page">
+        <div class="card">
+          <h2>小孩代辦設定</h2>
+          <p style="color: var(--sub); margin-bottom: 16px;">請由家人協助填寫長輩與緊急聯絡資料。</p>
+
+          <div class="form-group">
+            <label>老人姓名</label>
+            <input type="text" id="childName" placeholder="例如：張爺爺">
+          </div>
+          <div class="form-group">
+            <label>年紀</label>
+            <input type="number" id="childAge" placeholder="例如：75">
+          </div>
+          <div class="form-group">
+            <label>住家地址</label>
+            <input type="text" id="childAddress" placeholder="請輸入長輩住家地址">
+          </div>
+          <div class="form-group">
+            <label>家人聯絡電話</label>
+            <input type="tel" id="childPhone" placeholder="請輸入家人緊急聯絡電話">
+          </div>
+
+          <button class="btn-primary" onclick="saveChildProfile()">完成設定並登入</button>
+          <button class="btn-secondary" onclick="switchPage('page-mode')">← 返回選擇模式</button>
+        </div>
+      </section>
+
+      <!-- ELDER FORM PAGE -->
+      <section id="page-elder" class="page">
+        <div class="card">
+          <h2>老人自行登入</h2>
+          <p style="color: var(--sub); margin-bottom: 16px;">請輸入您的個人資料以完成驗證。</p>
+
+          <div class="form-group">
+            <label>姓名</label>
+            <input type="text" id="elderName" placeholder="請輸入您的姓名">
+          </div>
+          <div class="form-group">
+            <label>年紀</label>
+            <input type="number" id="elderAge" placeholder="請輸入您的年紀">
+          </div>
+          <div class="form-group">
+            <label>住家地址</label>
+            <input type="text" id="elderAddress" placeholder="請輸入您的住家地址">
+          </div>
+          <div class="form-group">
+            <label>電話</label>
+            <input type="tel" id="elderPhone" placeholder="請輸入您的電話號碼">
+          </div>
+
+          <button class="btn-primary" onclick="elderLogin()">登入</button>
+          <button class="btn-secondary" onclick="switchPage('page-mode')">← 返回選擇模式</button>
+        </div>
+      </section>
+
+      <!-- HOME PAGE -->
+      <section id="page-home" class="page">
+        <div class="card">
+          <h2 id="helloGreeting">您好，長輩</h2>
+          <p style="color: var(--sub);">遇到需要幫忙的事項，可以用語音說明或按下方紅色按鈕求救。</p>
+
+          <!-- Real Voice Section -->
+          <div style="background: var(--mint-light); border: 1px solid #bce5d3; padding: 16px; border-radius: 12px; margin: 16px 0; text-align: center;">
+            <p style="font-weight: 800; color: var(--mint); margin-bottom: 8px;">🎙️ 用語音說明需求</p>
+            <button class="btn-secondary" id="voiceBtn" onclick="toggleVoice()" style="background: #fff; transition: all .2s;">🎙️ 按一下開始說話</button>
+            <p id="voiceOutput" style="margin-top: 8px; font-size: 14px; color: var(--text); font-weight: 600; min-height: 24px;">點擊上方按鈕後，請開始對著麥克風說話...</p>
+          </div>
+
+          <button class="btn-sos" onclick="sendHelpRequest()">☎ 我要求救</button>
+
+          <div class="profile-card">
+            <h3 style="margin-bottom: 12px; color: var(--rose);">我的基本資料</h3>
+            <div class="profile-item"><span>姓名</span><strong id="showName">張爺爺</strong></div>
+            <div class="profile-item"><span>年紀</span><strong id="showAge">75 歲</strong></div>
+            <div class="profile-item"><span>住址</span><strong id="showAddress">台北市信義區忠孝東路五段 1 號</strong></div>
+            <div class="profile-item"><span>聯絡電話</span><strong id="showPhone">0912-345-678</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STATUS PAGE -->
+      <section id="page-status" class="page">
+        <div class="card" style="text-align: center;">
+          <h2 style="color: var(--mint); margin-bottom: 8px;">✓ 求救訊息已送出！</h2>
+          <p style="color: var(--sub);">附近的協助人員與志工將會收到通知。</p>
+
+          <div id="volunteerInfo" style="background: #f9f9f9; border: 1.5px solid var(--border); padding: 18px; border-radius: 12px; margin: 20px 0; display: none;">
+            <h3 style="color: var(--text);">⌖ 志工已接單並到達附近！</h3>
+            <p style="margin-top: 4px;"><strong>陳先生</strong> (距離約 0.8 公里)</p>
+            <p style="color: var(--mint); font-weight: 800; margin-top: 6px;">● 已到達地點</p>
+          </div>
+
+          <button id="finishBtn" class="btn-primary" style="display: none; margin-top: 12px;" onclick="switchPage('page-rating')">模擬：志工完成服務</button>
+        </div>
+      </section>
+
+      <!-- RATING PAGE -->
+      <section id="page-rating" class="page">
+        <div class="card" style="text-align: center;">
+          <h2>🎉 協助已完成！</h2>
+          <p style="color: var(--sub);">請幫這次提供協助的志工鼓勵與評分：</p>
+
+          <div class="star-rating" id="starContainer">
+            <span onclick="setRating(1)">★</span>
+            <span onclick="setRating(2)">★</span>
+            <span onclick="setRating(3)">★</span>
+            <span onclick="setRating(4)">★</span>
+            <span onclick="setRating(5)">★</span>
+          </div>
+
+          <button class="btn-primary" onclick="submitRating()">送出評價</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
 </div>
 
 <script>
-/* ==========================
-   全域變數
-========================== */
-let recognition = null;
-let isRecording = false;
-let selectedRating = 0;
+  let currentRating = 0;
+  let recognition = null;
+  let isListening = false;
 
-/* ==========================
-   切換頁面
-========================== */
-function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(function(screen) {
-    screen.classList.add("hidden");
-  });
-
-  document.getElementById(id).classList.remove("hidden");
-
-  const logout = document.getElementById("logoutBtn");
-  if (id === "home" || id === "rating") {
-    logout.classList.remove("hidden");
-  } else {
-    logout.classList.add("hidden");
-  }
-}
-
-/* ==========================
-   小孩代辦登入
-========================== */
-function saveChildProfile() {
-  const name = document.getElementById("childName").value.trim();
-  const age = document.getElementById("childAge").value.trim();
-  const address = document.getElementById("childAddress").value.trim();
-  const phone = document.getElementById("childPhone").value.trim();
-
-  if (!name || !age || !address || !phone) {
-    alert("請把資料填寫完整。");
-    return;
-  }
-
-  setUserData(name, age, address, phone);
-  showScreen("home");
-}
-
-/* ==========================
-   老人自行登入
-========================== */
-function elderLogin() {
-  const name = document.getElementById("elderName").value.trim();
-  const age = document.getElementById("elderAge").value.trim();
-  const address = document.getElementById("elderAddress").value.trim();
-  const phone = document.getElementById("elderPhone").value.trim();
-
-  if (!name || !age || !address || !phone) {
-    alert("請把姓名、年紀、地址和電話填寫完整。");
-    return;
-  }
-
-  setUserData(name, age, address, phone);
-  showScreen("home");
-}
-
-/* ==========================
-   顯示使用者資料
-========================== */
-function setUserData(name, age, address, phone) {
-  document.getElementById("showName").textContent = name;
-  document.getElementById("showAge").textContent = age + " 歲";
-  document.getElementById("showAddress").textContent = address;
-  document.getElementById("showPhone").textContent = phone;
-  document.getElementById("hello").textContent = "您好，" + name;
-}
-
-/* ==========================
-   語音功能
-========================== */
-function toggleVoice() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-    alert("您的瀏覽器不支援語音輸入，請使用最新版 Chrome 或 Edge。");
-    return;
-  }
-
-  if (isRecording) {
-    recognition.stop();
-    return;
-  }
-
-  recognition = new SpeechRecognition();
-  recognition.lang = "zh-TW";
-  recognition.continuous = true;
-  recognition.interimResults = true;
-
-  recognition.onstart = function() {
-    isRecording = true;
-    const btn = document.getElementById("voiceBtn");
-    btn.textContent = "🛑 停止錄音";
-    btn.classList.add("recording");
-  };
-
-  recognition.onresult = function(event) {
-    let text = "";
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      text += event.results[i][0].transcript;
+  // 1. 真實 Web Speech API 語音辨識初始化
+  function initSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      alert("⚠️ 您的瀏覽器不支援原生語音辨識，建議使用 Google Chrome 或 Microsoft Edge 瀏覽器！");
+      return null;
     }
-    document.getElementById("transcript").textContent = text;
-  };
 
-  recognition.onerror = function(event) {
-    alert("語音輸入發生問題：" + event.error);
-  };
+    const rec = new SpeechRecognition();
+    rec.lang = 'zh-TW'; // 繁體中文
+    rec.continuous = false; // 自動偵測說完停止
+    rec.interimResults = true; // 即時顯示辨識過程
 
-  recognition.onend = function() {
-    isRecording = false;
+    rec.onstart = () => {
+      isListening = true;
+      const btn = document.getElementById("voiceBtn");
+      btn.textContent = "🔴 聆聽中，請說話...";
+      btn.classList.add("listening");
+      document.getElementById("voiceOutput").textContent = "正在聆聽您的聲音...";
+    };
+
+    rec.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      document.getElementById("voiceOutput").textContent = "「" + transcript + "」";
+    };
+
+    rec.onerror = (event) => {
+      console.error("語音辨識錯誤:", event.error);
+      if (event.error === 'not-allowed') {
+        alert("🔴 麥克風權限被阻擋！請點擊網址列左側的鎖頭，允許此頁面使用「麥克風」。");
+      } else if (event.error === 'no-speech') {
+        document.getElementById("voiceOutput").textContent = "沒有聽清楚，請再試一次。";
+      } else {
+        document.getElementById("voiceOutput").textContent = "語音辨識出錯：" + event.error;
+      }
+      resetVoiceUI();
+    };
+
+    rec.onend = () => {
+      resetVoiceUI();
+    };
+
+    return rec;
+  }
+
+  function resetVoiceUI() {
+    isListening = false;
     const btn = document.getElementById("voiceBtn");
-    btn.textContent = "🎤 按一下開始說話";
-    btn.classList.remove("recording");
-  };
-
-  recognition.start();
-}
-
-/* ==========================
-   確認送出語音需求
-========================== */
-function confirmVoiceHelp() {
-  if (isRecording) {
-    recognition.stop();
+    btn.textContent = "🎙️ 按一下開始說話";
+    btn.classList.remove("listening");
   }
 
-  const text = document.getElementById("transcript").textContent.trim();
+  function toggleVoice() {
+    if (!recognition) {
+      recognition = initSpeechRecognition();
+    }
+    if (!recognition) return;
 
-  if (!text || text === "您說的內容會顯示在這裡……") {
-    alert("請先用語音說明您需要什麼幫忙。");
-    return;
-  }
-
-  document.getElementById("helpResult").classList.remove("hidden");
-  alert("已確認您的需求並成功送出！");
-}
-
-/* ==========================
-   發出急救求救
-========================== */
-function sendHelp() {
-  document.getElementById("helpResult").classList.remove("hidden");
-  alert("求救訊息已送出！");
-}
-
-/* ==========================
-   選擇年輕人
-========================== */
-function chooseHelper(name) {
-  alert("已選擇 " + name + " 協助您。");
-}
-
-/* ==========================
-   模擬工作完成
-========================== */
-function finishHelp() {
-  showScreen("rating");
-}
-
-/* ==========================
-   愛心評分
-========================== */
-function rateHeart(number) {
-  selectedRating = number;
-  const hearts = document.querySelectorAll(".heart");
-
-  hearts.forEach(function(heart, index) {
-    if (index < number) {
-      heart.classList.add("active");
+    if (isListening) {
+      recognition.stop();
     } else {
-      heart.classList.remove("active");
+      try {
+        recognition.start();
+      } catch (err) {
+        console.error("啟動失敗", err);
+      }
     }
-  });
-
-  const text = document.getElementById("ratingText");
-  const messages = {
-    1: "😞 需要再加油",
-    2: "😐 普通",
-    3: "🙂 還不錯",
-    4: "😊 很棒",
-    5: "🥳 非常棒！"
-  };
-
-  text.textContent = messages[number];
-}
-
-/* ==========================
-   送出評價
-========================== */
-function submitRating() {
-  if (selectedRating === 0) {
-    alert("請先點選愛心評分。");
-    return;
   }
 
-  document.getElementById("ratingSuccess").classList.remove("hidden");
-  alert("謝謝您的評價！");
-}
+  // 2. 頁面控制與表單邏輯
+  function switchPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) targetPage.classList.add('active');
+
+    if (pageId === 'page-mode') {
+      document.getElementById('nav-mode').classList.add('active');
+      document.getElementById('topbarTitle').textContent = '身分驗證';
+    } else if (pageId === 'page-home') {
+      document.getElementById('nav-home').classList.add('active');
+      document.getElementById('topbarTitle').textContent = '求救與求助主頁';
+    } else {
+      document.getElementById('topbarTitle').textContent = '銀伴 Silver Companion';
+    }
+  }
+
+  function saveChildProfile() {
+    const name = document.getElementById("childName").value.trim();
+    const age = document.getElementById("childAge").value.trim();
+    const address = document.getElementById("childAddress").value.trim();
+    const phone = document.getElementById("childPhone").value.trim();
+
+    if (!validateInputs(["childName", "childAge", "childAddress", "childPhone"])) return;
+
+    updateProfile(name, age, address, phone, "小孩代辦登入");
+    switchPage("page-home");
+  }
+
+  function elderLogin() {
+    const name = document.getElementById("elderName").value.trim();
+    const age = document.getElementById("elderAge").value.trim();
+    const address = document.getElementById("elderAddress").value.trim();
+    const phone = document.getElementById("elderPhone").value.trim();
+
+    if (!validateInputs(["elderName", "elderAge", "elderAddress", "elderPhone"])) return;
+
+    updateProfile(name, age, address, phone, "老人自行登入");
+    switchPage("page-home");
+  }
+
+  function validateInputs(elementIds) {
+    let hasError = false;
+    elementIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) {
+        el.style.borderColor = "#e53935";
+        hasError = true;
+      } else {
+        el.style.borderColor = "var(--border2)";
+      }
+    });
+
+    if (hasError) {
+      alert("🔴 請完成所有必填欄位後再進行登入！");
+      return false;
+    }
+    return true;
+  }
+
+  function updateProfile(name, age, address, phone, roleText) {
+    document.getElementById("showName").textContent = name;
+    document.getElementById("showAge").textContent = age + " 歲";
+    document.getElementById("showAddress").textContent = address;
+    document.getElementById("showPhone").textContent = phone;
+    document.getElementById("helloGreeting").textContent = "您好，" + name;
+
+    document.getElementById("userName").textContent = name;
+    document.getElementById("userRole").textContent = roleText;
+    document.getElementById("userAvatar").textContent = name.charAt(0) || "長";
+  }
+
+  function sendHelpRequest() {
+    switchPage("page-status");
+    setTimeout(() => {
+      document.getElementById("volunteerInfo").style.display = "block";
+      document.getElementById("finishBtn").style.display = "block";
+    }, 1500);
+  }
+
+  function setRating(rating) {
+    currentRating = rating;
+    const stars = document.querySelectorAll("#starContainer span");
+    stars.forEach((star, idx) => {
+      if (idx < rating) {
+        star.classList.add("active");
+      } else {
+        star.classList.remove("active");
+      }
+    });
+  }
+
+  function submitRating() {
+    if (currentRating === 0) {
+      alert("請點選星級進行評分");
+      return;
+    }
+    alert("❤️ 謝謝您的評價！需求已順利完成。");
+    currentRating = 0;
+    setRating(0);
+    document.getElementById("volunteerInfo").style.display = "none";
+    document.getElementById("finishBtn").style.display = "none";
+    switchPage("page-home");
+  }
+
+  function logout() {
+    document.getElementById("userName").textContent = "未登入";
+    document.getElementById("userRole").textContent = "請先驗證身分";
+    document.getElementById("userAvatar").textContent = "客";
+    switchPage("page-mode");
+  }
 </script>
 
 </body>
