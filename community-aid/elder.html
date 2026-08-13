@@ -827,7 +827,7 @@ function elderLogin() {
    老人自行註冊（填完整資料，存入帳號庫）
 ========================== */
 function elderRegister() {
-  var nameReg  = /^[\u4e00-\u9fa5a-zA-Z]{3,4}$/;
+  var nameReg  = /^[\u4e00-\u9fa5a-zA-Z]{2,4}$/;
   var phoneReg = /^09\d{8}$/;
   var name    = document.getElementById('regName').value.trim();
   var age     = document.getElementById('regAge').value.trim();
@@ -854,7 +854,7 @@ function elderRegister() {
    小孩代辦（建立或更新帳號，直接登入）
 ========================== */
 function saveChildProfile() {
-  var nameReg  = /^[\u4e00-\u9fa5a-zA-Z]{3,4}$/;
+  var nameReg  = /^[\u4e00-\u9fa5a-zA-Z]{2,4}$/;
   var phoneReg = /^09\d{8}$/;
   var name    = document.getElementById('childName').value.trim();
   var age     = document.getElementById('childAge').value.trim();
