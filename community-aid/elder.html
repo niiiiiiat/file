@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>老人救助平台</title>
+<style>
+*,*::before,*::after { box-sizing: border-box; }
+:root {
+  --rose: #d9475e; --rose-h: #b83650; --rose-light: #fbeaed; --rose-xlight: #fdf5f6;
+  --mint: #3daa7e; --mint-light: #eaf7f2;
+  --lav: #8b72cc; --lav-light: #f0ebfa;
+  --bg: #f9f9f9; --card: #fff;
+  --border: #e8e4e0; --border2: #d8d3ce;
+  --text: #1e1a17; --sub: #7a706b; --xs: #b0a8a3;
+  --sh: 0 1px 8px rgba(0,0,0,.06);
+  --shm: 0 3px 16px rgba(0,0,0,.1);
+  --font: 'Helvetica Neue','PingFang TC','Microsoft JhengHei',sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+}
+
+button, input {
+  font: inherit;
+}
+
+.app {
+  max-width: 900px;
+  min-height: 100vh;
+  margin: auto;
+  background: var(--card);
+  box-shadow: 0 0 40px rgba(0,0,0,.06);
+}
+
+/* =========================
+   頁首
+========================= */
+header {
+  background: var(--rose);
+  color: white;
+  padding: 22px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: .3px;
+}
+
+header small {
+  display: block;
+  font-size: 14px;
+  margin-top: 4px;
+  opacity: .85;
+  font-weight: 600;
+}
+
+/* =========================
+   一般頁面
+========================= */
+.screen {
+  padding: 34px 28px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+h2 {
+  font-size: 40px;
+  margin: 10px 0;
+  color: var(--text);
+}
+
+h3 {
+  font-size: 28px;
+  color: var(--text);
+}
+
+p, label {
+  font-size: 22px;
+  line-height: 1.6;
+  color: var(--sub);
+}
+
+/* =========================
+   登入選項
+========================= */
+.choice {
+  width: 100%;
+  margin: 18px 0;
+  padding: 28px;
+  border: 1.5px solid var(--border2);
+  border-radius: 14px;
+  background: var(--card);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--sh);
+  transition: box-shadow .2s, border-color .2s;
+}
+
+.choice:hover {
+  box-shadow: var(--shm);
+  border-color: var(--rose);
+}
+
+.choice strong {
+  display: block;
+  font-size: 30px;
+  color: var(--text);
+}
+
+.choice span {
+  font-size: 20px;
+  color: var(--sub);
+}
+
+.icon {
+  font-size: 45px;
+  margin-right: 14px;
+}
+
+/* =========================
+   表單
+========================= */
+.form {
+  max-width: 650px;
+  margin: 20px auto;
+}
+
+input {
+  width: 100%;
+  padding: 20px;
+  margin: 8px 0 20px;
+  border: 1.5px solid var(--border2);
+  border-radius: 14px;
+  font-size: 24px;
+  background: var(--card);
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+input:focus {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px rgba(217,71,94,.1);
+}
+
+/* =========================
+   按鈕
+========================= */
+.primary,
+.danger,
+.secondary,
+.voice-btn,
+.confirm-btn,
+.accept-btn {
+  border: 0;
+  border-radius: 16px;
+  padding: 20px 28px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 25px;
+  transition: background .2s;
+}
+
+.primary {
+  background: var(--rose);
+  color: white;
+  width: 100%;
+}
+
+.primary:hover {
+  background: var(--rose-h);
+}
+
+.secondary {
+  background: var(--bg);
+  color: var(--sub);
+  border: 1.5px solid var(--border2);
+}
+
+.secondary:hover {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+.danger {
+  background: var(--rose);
+  color: white;
+  width: 100%;
+  font-size: 38px;
+  padding: 28px;
+  margin: 20px 0;
+}
+
+.danger:hover {
+  background: var(--rose-h);
+}
+
+.danger:active {
+  transform: scale(.98);
+}
+
+.back {
+  margin-top: 15px;
+}
+
+/* =========================
+   卡片與資訊
+========================= */
+.card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 25px;
+  margin: 20px 0;
+  box-shadow: var(--sh);
+}
+
+.info-row {
+  display: flex;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 24px;
+  color: var(--text);
+}
+
+.info-row:last-child {
+  border-bottom: 0;
+}
+
+.info-row b {
+  min-width: 100px;
+  color: var(--sub);
+  font-weight: 700;
+}
+
+.notice {
+  background: var(--lav-light);
+  border: 1px solid var(--lav);
+  border-radius: 14px;
+  padding: 20px;
+  font-size: 20px;
+  color: var(--sub);
+}
+
+.success {
+  background: var(--mint-light);
+  border: 1.5px solid var(--mint);
+  border-radius: 14px;
+  padding: 20px;
+  font-size: 23px;
+  margin-top: 15px;
+  color: var(--text);
+}
+
+/* =========================
+   語音求救區域
+========================= */
+.voice-box {
+  background: var(--rose-xlight);
+  border: 1.5px solid var(--rose-light);
+  border-radius: 14px;
+  padding: 25px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.voice-action-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.voice-btn {
+  background: var(--rose);
+  color: white;
+  flex: 2;
+  font-size: 26px;
+}
+
+.voice-btn:hover {
+  background: var(--rose-h);
+}
+
+.voice-btn.recording {
+  background: #c0392b;
+  animation: pulse 1s infinite;
+}
+
+.confirm-btn {
+  background: var(--mint);
+  color: white;
+  flex: 1;
+  font-size: 26px;
+  white-space: nowrap;
+}
+
+.confirm-btn:hover {
+  background: #2e9168;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(.98);
+    opacity: .8;
+  }
+}
+
+.transcript {
+  min-height: 100px;
+  background: var(--card);
+  border: 1.5px solid var(--border2);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: left;
+  font-size: 22px;
+  margin-top: 18px;
+  color: var(--text);
+}
+
+.voice-hint {
+  font-size: 18px;
+  color: var(--sub);
+}
+
+/* =========================
+   年輕人推薦
+========================= */
+.match {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin: 14px 0;
+  transition: border-color .2s;
+}
+
+.match:hover {
+  border-color: var(--border2);
+}
+
+.avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--rose-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  flex-shrink: 0;
+}
+
+.match-info {
+  flex: 1;
+}
+
+.match-info strong {
+  font-size: 23px;
+  color: var(--text);
+}
+
+.match-info div {
+  font-size: 18px;
+  margin-top: 4px;
+  color: var(--sub);
+}
+
+.accept-btn {
+  background: var(--rose);
+  color: white;
+  padding: 13px 18px;
+  font-size: 20px;
+  white-space: nowrap;
+}
+
+.accept-btn:hover {
+  background: var(--rose-h);
+}
+
+.tag {
+  display: inline-block;
+  background: var(--mint-light);
+  color: var(--mint);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 16px;
+  margin-top: 5px;
+  font-weight: 700;
+}
+
+/* =========================
+   常見需求
+========================= */
+.task {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 0;
+  font-size: 21px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.task:last-child {
+  border-bottom: 0;
+}
+
+/* =========================
+   完成協助與評分
+========================= */
+.finish-card {
+  background: var(--mint-light);
+  border: 1.5px solid var(--mint);
+  border-radius: 14px;
+  padding: 30px;
+  text-align: center;
+  margin: 25px 0;
+}
+
+.finish-icon {
+  font-size: 65px;
+}
+
+.finish-card h2 {
+  color: var(--mint);
+  font-size: 34px;
+}
+
+.rating-box {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  border: 1px solid var(--border);
+}
+
+.hearts {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.heart {
+  border: none;
+  background: transparent;
+  font-size: 52px;
+  color: var(--border2);
+  cursor: pointer;
+  padding: 3px;
+  transition: color .15s;
+}
+
+.heart.active {
+  color: var(--rose);
+}
+
+.rating-text {
+  font-size: 25px;
+  font-weight: bold;
+  text-align: center;
+  min-height: 40px;
+  color: var(--text);
+}
+
+.submit-rating {
+  background: var(--rose);
+  color: white;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.submit-rating:hover {
+  background: var(--rose-h);
+}
+
+.rating-success {
+  background: var(--mint-light);
+  border: 1.5px solid var(--mint);
+  border-radius: 12px;
+  padding: 20px;
+  font-size: 22px;
+  margin-top: 20px;
+  text-align: center;
+  color: var(--text);
+}
+
+/* 返回首頁按鈕 */
+.home-link {
+  display: inline-block;
+  margin: 18px 0 0;
+  padding: 14px 28px;
+  background: var(--bg);
+  color: var(--sub);
+  border: 1.5px solid var(--border2);
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color .2s, color .2s;
+}
+
+.home-link:hover {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+/* RWD 響應式 */
+@media (max-width: 600px) {
+  h2 {
+    font-size: 32px;
+  }
+
+  header h1 {
+    font-size: 25px;
+  }
+
+  .screen {
+    padding: 24px 18px;
+  }
+
+  .voice-action-group {
+    flex-direction: column;
+  }
+
+  .voice-btn, .confirm-btn {
+    width: 100%;
+  }
+
+  .danger {
+    font-size: 30px;
+  }
+
+  .match {
+    align-items: flex-start;
+  }
+
+  .accept-btn {
+    font-size: 18px;
+    padding: 10px;
+  }
+
+  .heart {
+    font-size: 43px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+<!-- =========================
+       頁首
+  ========================= -->
+<header>
+  <div>
+    <h1>♡ 老人救助平台</h1>
+    <small>關懷老人，即時救助</small>
+  </div>
+  <button class="secondary hidden" id="logoutBtn" onclick="showScreen('login')">登出</button>
+</header>
+<!-- =========================
+       身分驗證
+  ========================= -->
+<section id="login" class="screen">
+  <h2>身分驗證</h2>
+  <p>請選擇登入方式</p>
+  <!-- 小孩代辦 -->
+  <button class="choice" onclick="showScreen('childLogin')">
+    <span class="icon">👨‍👩‍👧</span>
+    <strong>小孩代辦登入</strong>
+    <span>由子女或家人協助設定帳號，老人不需要自己記住帳號密碼</span>
+  </button>
+  <!-- 老人自行登入 -->
+  <button class="choice" style="border-color:#a8d58f" onclick="showScreen('elderLogin')">
+    <span class="icon">👴</span>
+    <strong>老人自行登入</strong>
+    <span>我已經有帳號，可以自己登入</span>
+  </button>
+  <div class="notice">
+    <strong>還沒有帳號嗎？</strong><br>
+    請由您的子女或家人協助申請帳號。
+  </div>
+  <a href="index.html" class="home-link">← 返回角色選擇</a>
+</section>
+<!-- =========================
+       小孩代辦
+  ========================= -->
+<section id="childLogin" class="screen hidden">
+  <div class="form">
+    <h2>小孩代辦設定</h2>
+    <p>請由家人協助填寫長輩資料。</p>
+    <label>老人姓名</label>
+    <input id="childName" placeholder="例如：王阿姨">
+    <label>年紀</label>
+    <input id="childAge" type="number" placeholder="例如：72">
+    <label>住家地址</label>
+    <input id="childAddress" placeholder="例如：高雄市○○區○○路">
+    <label>家人聯絡電話</label>
+    <input id="childPhone" type="tel" placeholder="例如：0912-345-678">
+    <button class="primary" onclick="saveChildProfile()">完成設定並登入</button>
+    <button class="secondary back" onclick="showScreen('login')">← 返回</button>
+  </div>
+</section>
+<!-- =========================
+       老人自行登入
+  ========================= -->
+<section id="elderLogin" class="screen hidden">
+  <div class="form">
+    <h2>老人自行登入</h2>
+    <label>姓名</label>
+    <input id="elderName" placeholder="請輸入您的姓名">
+    <label>年紀</label>
+    <input id="elderAge" type="number" placeholder="例如：75">
+    <label>住家地址</label>
+    <input id="elderAddress" placeholder="請輸入住家地址">
+    <label>電話</label>
+    <input id="elderPhone" type="tel" placeholder="例如：0912-345-678">
+    <button class="primary" onclick="elderLogin()">登入</button>
+    <button class="secondary back" onclick="showScreen('login')">← 返回</button>
+  </div>
+</section>
+<!-- =========================
+       老人首頁
+  ========================= -->
+<section id="home" class="screen hidden">
+  <h2 id="hello">您好，長輩</h2>
+  <p>遇到需要幫忙的事情，可以用語音告訴我們。</p>
+  <!-- 語音求救 -->
+  <div class="voice-box">
+    <h3>🎙 用語音說明需要什麼幫忙</h3>
+    <p class="voice-hint">例如：「我的燈泡壞了，想請人幫忙更換。」</p>
+    <div id="transcript" class="transcript">您說的內容會顯示在這裡……</div>
+    <div class="voice-action-group">
+      <button id="voiceBtn" class="voice-btn" onclick="toggleVoice()">🎤 按一下開始說話</button>
+      <button class="confirm-btn" onclick="confirmVoiceHelp()">✓ 確定送出</button>
+    </div>
+  </div>
+  <!-- 急救求救 -->
+  <button class="danger" onclick="sendHelp()">🆘 我要求救</button>
+  <!-- 求救/需求送出成功提示 -->
+  <div id="helpResult" class="success hidden">
+    ✓ 需求訊息已送出！<br>
+    您的語音需求已傳給附近的協助人員。
+  </div>
+  <!-- 我的需求列表 -->
+  <div class="card">
+    <h3>📋 我送出的需求</h3>
+    <div id="myRequestList"><p style="color:var(--sub);font-size:18px;">尚未送出任何需求。</p></div>
+  </div>
+  <!-- 常見需求 -->
+  <div class="card">
+    <h3>📋 常見需要幫忙的事項</h3>
+    <div class="task"><span>💡 更換燈泡、簡單居家修繕</span></div>
+    <div class="task"><span>🛒 買菜、買生活用品</span></div>
+    <div class="task"><span>📦 協助領取物品或跑腿</span></div>
+    <div class="task"><span>🚶 陪同外出、散步</span></div>
+    <div class="task"><span>💪 搬運較重的物品</span></div>
+  </div>
+  <!-- 個人資料 -->
+  <div class="card">
+    <h3>👤 我的基本資料</h3>
+    <div class="info-row"><b>姓名</b><span id="showName">尚未設定</span></div>
+    <div class="info-row"><b>年紀</b><span id="showAge">尚未設定</span></div>
+    <div class="info-row"><b>地址</b><span id="showAddress">尚未設定</span></div>
+    <div class="info-row"><b>電話</b><span id="showPhone">尚未設定</span></div>
+  </div>
+  <!-- 協助狀態 -->
+  <div class="card" id="activeTaskCard" class="hidden">
+    <h3>⚙️ 協助狀態</h3>
+    <div id="activeTaskInfo"></div>
+  </div>
+  <div class="notice">⚠️ 非緊急情況請不要使用求救按鈕。</div>
+  <button class="secondary back" onclick="showScreen('login')">登出</button>
+</section>
+<!-- =========================
+       完成工作＋評分頁面
+  ========================= -->
+<section id="rating" class="screen hidden">
+  <div class="finish-card">
+    <div class="finish-icon">🎉</div>
+    <h2>協助已完成！</h2>
+    <p>服務人員已經完成這次的協助。</p>
+    <div class="rating-box">
+      <h3>❤️ 請幫這位年輕人評分</h3>
+      <p>您覺得這次的服務好嗎？</p>
+      <div class="hearts" id="hearts">
+        <button class="heart" onclick="rateHeart(1)">♥</button>
+        <button class="heart" onclick="rateHeart(2)">♥</button>
+        <button class="heart" onclick="rateHeart(3)">♥</button>
+        <button class="heart" onclick="rateHeart(4)">♥</button>
+        <button class="heart" onclick="rateHeart(5)">♥</button>
+      </div>
+      <div id="ratingText" class="rating-text">請點選愛心評分</div>
+      <button class="submit-rating" onclick="submitRating()">送出我的評價</button>
+      <div id="ratingSuccess" class="rating-success hidden">
+        ❤️ 謝謝您的評價！<br>您的意見對我們非常重要。
+      </div>
+    </div>
+  </div>
+  <button class="secondary" onclick="showScreen('home')">← 回到首頁</button>
+</section>
+</div>
+<script>
+/* ============================================================
+   localStorage 存取工具
+   key 說明：
+     sc_tasks      – 所有任務（老人送出的需求 + 預設種子資料）
+     sc_elder_user – 目前登入的老人資料
+     sc_ratings    – 評分記錄 [{taskId, score, at}]
+============================================================ */
+function lsGet(k) {
+  try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; }
+}
+function lsSet(k, v) {
+  try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {}
+}
+
+// 若 sc_tasks 尚無資料，寫入種子資料（預設的6筆）
+function seedTasks() {
+  if (lsGet('sc_tasks')) return;
+  var seed = [
+    {id:'s1',name:'陳奶奶',emoji:'👵',age:72,area:'高雄市左營區',need:'陪同去附近醫院看診',date:'8月15日',time:'下午2:00',duration:'約2小時',category:'陪同就醫',distance:1.2,note:'走路比較慢，希望有人陪同，家屬無法請假陪同。',caution:'請提前10分鐘抵達。長輩行動不便，請耐心陪伴。',status:'open',createdAt:Date.now()-500000},
+    {id:'s2',name:'李爺爺',emoji:'👴',age:80,area:'高雄市三民區',need:'幫忙去市場購買蔬菜與日用品',date:'8月16日',time:'上午9:00',duration:'約1.5小時',category:'採買生活用品',distance:2.5,note:'有購物清單，共約10樣物品，金額將當場給付。',caution:'清單已準備好，請出發前與長輩確認。',status:'open',createdAt:Date.now()-400000},
+    {id:'s3',name:'林阿嬤',emoji:'👵',age:75,area:'高雄市苓雅區',need:'教導如何使用 LINE 視訊通話',date:'8月17日',time:'下午3:00',duration:'約1小時',category:'教手機／科技',distance:3.1,note:'已有智慧型手機，想學習視訊通話聯絡子女。',caution:'請有耐心，長輩學習速度較慢，可能需要重複說明。',status:'open',createdAt:Date.now()-300000},
+    {id:'s4',name:'黃爺爺',emoji:'👴',age:85,area:'高雄市鼓山區',need:'陪伴聊天、說說話',date:'8月18日',time:'下午2:30',duration:'約1小時',category:'陪伴聊天',distance:4.0,note:'獨居，子女在外地，希望有人陪伴說說話。',caution:'長輩精神狀況良好，喜歡聊歷史與台灣故事。',status:'open',createdAt:Date.now()-200000},
+    {id:'s5',name:'吳阿嬤',emoji:'👵',age:78,area:'高雄市新興區',need:'幫忙去藥局領取慢性病藥物',date:'8月19日',time:'上午10:30',duration:'約45分鐘',category:'其他',distance:1.8,note:'藥局距離約500公尺，有藥單，需簽名領取。',caution:'藥單已準備好，藥費將事先給付。',status:'open',createdAt:Date.now()-100000},
+    {id:'s6',name:'蔡爺爺',emoji:'👴',age:82,area:'高雄市前鎮區',need:'協助搬移輕型家具與整理房間',date:'8月20日',time:'上午11:00',duration:'約2小時',category:'家務協助',distance:5.3,note:'需要將客廳沙發與書架位置對調，物品不重，約2人可完成。',caution:'請穿著舒適便於活動的衣物。',status:'open',createdAt:Date.now()-50000}
+  ];
+  lsSet('sc_tasks', seed);
+}
+seedTasks();
+
+/* ==========================
+   全域變數
+========================== */
+let recognition = null;
+let isRecording = false;
+let selectedRating = 0;
+let currentElderUser = null;
+let pendingRatingTaskId = null;
+
+/* ==========================
+   切換頁面
+========================== */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.add('hidden'); });
+  document.getElementById(id).classList.remove('hidden');
+  var logout = document.getElementById('logoutBtn');
+  if (id === 'home' || id === 'rating') {
+    logout.classList.remove('hidden');
+  } else {
+    logout.classList.add('hidden');
+  }
+  if (id === 'home') {
+    renderMyRequests();
+    renderActiveTask();
+  }
+}
+
+/* ==========================
+   小孩代辦登入
+========================== */
+function saveChildProfile() {
+  var name    = document.getElementById('childName').value.trim();
+  var age     = document.getElementById('childAge').value.trim();
+  var address = document.getElementById('childAddress').value.trim();
+  var phone   = document.getElementById('childPhone').value.trim();
+  if (!name || !age || !address || !phone) { alert('請把資料填寫完整。'); return; }
+  doSetUser(name, age, address, phone);
+  showScreen('home');
+}
+
+/* ==========================
+   老人自行登入（依姓名查找已存資料，否則新建）
+========================== */
+function elderLogin() {
+  var name    = document.getElementById('elderName').value.trim();
+  var age     = document.getElementById('elderAge').value.trim();
+  var address = document.getElementById('elderAddress').value.trim();
+  var phone   = document.getElementById('elderPhone').value.trim();
+  if (!name || !age || !address || !phone) { alert('請把姓名、年紀、地址和電話填寫完整。'); return; }
+  doSetUser(name, age, address, phone);
+  showScreen('home');
+}
+
+function doSetUser(name, age, address, phone) {
+  currentElderUser = { name: name, age: age, address: address, phone: phone };
+  lsSet('sc_elder_user', currentElderUser);
+  document.getElementById('showName').textContent    = name;
+  document.getElementById('showAge').textContent     = age + ' 歲';
+  document.getElementById('showAddress').textContent = address;
+  document.getElementById('showPhone').textContent   = phone;
+  document.getElementById('hello').textContent       = '您好，' + name;
+}
+
+/* ==========================
+   語音功能
+========================== */
+function toggleVoice() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('您的瀏覽器不支援語音輸入，請使用最新版 Chrome 或 Edge。'); return; }
+  if (isRecording) { recognition.stop(); return; }
+  recognition = new SR();
+  recognition.lang = 'zh-TW';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onstart = function() {
+    isRecording = true;
+    var btn = document.getElementById('voiceBtn');
+    btn.textContent = '🛑 停止錄音';
+    btn.classList.add('recording');
+  };
+  recognition.onresult = function(event) {
+    var text = '';
+    for (var i = event.resultIndex; i < event.results.length; i++) {
+      text += event.results[i][0].transcript;
+    }
+    document.getElementById('transcript').textContent = text;
+  };
+  recognition.onerror = function(event) { alert('語音輸入發生問題：' + event.error); };
+  recognition.onend = function() {
+    isRecording = false;
+    var btn = document.getElementById('voiceBtn');
+    btn.textContent = '🎤 按一下開始說話';
+    btn.classList.remove('recording');
+  };
+  recognition.start();
+}
+
+/* ==========================
+   確認送出語音需求 → 寫入 sc_tasks
+========================== */
+function confirmVoiceHelp() {
+  if (isRecording) recognition.stop();
+  var text = document.getElementById('transcript').textContent.trim();
+  if (!text || text === '您說的內容會顯示在這裡……') {
+    alert('請先用語音說明您需要什麼幫忙。'); return;
+  }
+  submitRequest(text, '語音需求', '📣');
+}
+
+/* ==========================
+   急救求救 → 寫入 sc_tasks（category: 緊急求救）
+========================== */
+function sendHelp() {
+  submitRequest('🆘 緊急求救，請立即協助！', '緊急求救', '🆘');
+}
+
+/* ==========================
+   公用：建立任務並存入 localStorage
+========================== */
+function submitRequest(need, category, emoji) {
+  if (!currentElderUser) { alert('請先登入。'); return; }
+  var tasks = lsGet('sc_tasks') || [];
+  var now   = Date.now();
+  var d     = new Date(now);
+  var dateStr = (d.getMonth()+1) + '月' + d.getDate() + '日';
+  var timeStr = d.getHours() + ':' + (d.getMinutes()<10?'0':'')+d.getMinutes();
+  var task = {
+    id:        'e' + now,
+    name:      currentElderUser.name,
+    emoji:     emoji,
+    age:       parseInt(currentElderUser.age),
+    area:      currentElderUser.address,
+    need:      need,
+    date:      dateStr,
+    time:      timeStr,
+    duration:  '待確認',
+    category:  category,
+    distance:  0,
+    note:      '由長輩本人透過本平台送出。',
+    caution:   '請禮貌親切地與長輩溝通，確認需求細節。',
+    status:    'open',
+    createdAt: now,
+    elderPhone: currentElderUser.phone
+  };
+  tasks.push(task);
+  lsSet('sc_tasks', tasks);
+  document.getElementById('helpResult').classList.remove('hidden');
+  document.getElementById('transcript').textContent = '您說的內容會顯示在這裡……';
+  renderMyRequests();
+}
+
+/* ==========================
+   顯示「我的需求」列表
+========================== */
+function renderMyRequests() {
+  if (!currentElderUser) return;
+  var tasks = lsGet('sc_tasks') || [];
+  var mine = tasks.filter(function(t){ return t.name === currentElderUser.name && t.id.charAt(0)==='e'; });
+  var el = document.getElementById('myRequestList');
+  if (!mine.length) {
+    el.innerHTML = '<p style="color:var(--sub);font-size:18px;">尚未送出任何需求。</p>';
+    return;
+  }
+  var statusLabel = { open:'等待志工接單', taken:'志工已接單 ✓', done:'已完成 🎉' };
+  var statusColor = { open:'var(--sub)', taken:'var(--rose)', done:'var(--mint)' };
+  el.innerHTML = mine.slice().reverse().map(function(t){
+    return '<div style="padding:14px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;">'
+      + '<div style="flex:1">'
+      + '<div style="font-size:18px;font-weight:700;color:var(--text);">' + t.need + '</div>'
+      + '<div style="font-size:15px;color:var(--sub);margin-top:4px;">' + t.date + ' ' + t.time + '・' + t.category + '</div>'
+      + (t.volunteer ? '<div style="font-size:15px;color:var(--rose);margin-top:2px;">志工：' + t.volunteer + '</div>' : '')
+      + '</div>'
+      + '<div style="font-weight:700;font-size:15px;color:' + statusColor[t.status] + ';white-space:nowrap;">' + (statusLabel[t.status]||t.status) + '</div>'
+      + (t.status==='taken'
+          ? '<button onclick="markDone(\'' + t.id + '\')" style="margin-left:10px;background:var(--mint);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:15px;font-weight:700;cursor:pointer;">✓ 確認完成</button>'
+          : '')
+      + '</div>';
+  }).join('');
+}
+
+/* ==========================
+   長輩確認任務完成 → 跳評分頁
+========================== */
+function markDone(taskId) {
+  pendingRatingTaskId = taskId;
+  showScreen('rating');
+}
+
+/* ==========================
+   顯示進行中任務狀態
+========================== */
+function renderActiveTask() {
+  if (!currentElderUser) return;
+  var tasks = lsGet('sc_tasks') || [];
+  var ongoing = tasks.filter(function(t){ return t.name===currentElderUser.name && t.status==='taken'; });
+  var card = document.getElementById('activeTaskCard');
+  var info = document.getElementById('activeTaskInfo');
+  if (!ongoing.length) { card.style.display='none'; return; }
+  card.style.display='block';
+  info.innerHTML = ongoing.map(function(t){
+    return '<div style="padding:12px 0;border-bottom:1px solid var(--border);">'
+      + '<div style="font-size:20px;font-weight:700;color:var(--text);">' + t.need + '</div>'
+      + '<div style="font-size:17px;color:var(--rose);margin-top:6px;">志工 ' + (t.volunteer||'（確認中）') + ' 正在前來協助</div>'
+      + '<button onclick="markDone(\'' + t.id + '\')" style="margin-top:14px;background:var(--mint);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:18px;font-weight:700;cursor:pointer;width:100%;">✓ 志工已完成協助，前往評分</button>'
+      + '</div>';
+  }).join('');
+}
+
+/* ==========================
+   愛心評分
+========================== */
+function rateHeart(number) {
+  selectedRating = number;
+  document.querySelectorAll('.heart').forEach(function(h, i){
+    h.classList.toggle('active', i < number);
+  });
+  var msgs = {1:'😞 需要再加油',2:'😐 普通',3:'🙂 還不錯',4:'😊 很棒',5:'🥳 非常棒！'};
+  document.getElementById('ratingText').textContent = msgs[number];
+}
+
+/* ==========================
+   送出評價 → 寫入 sc_ratings，更新任務狀態為 done
+========================== */
+function submitRating() {
+  if (selectedRating === 0) { alert('請先點選愛心評分。'); return; }
+  // 更新任務狀態
+  if (pendingRatingTaskId) {
+    var tasks = lsGet('sc_tasks') || [];
+    tasks = tasks.map(function(t){
+      if (t.id === pendingRatingTaskId) { t.status = 'done'; t.rating = selectedRating; }
+      return t;
+    });
+    lsSet('sc_tasks', tasks);
+    // 寫入評分記錄
+    var ratings = lsGet('sc_ratings') || [];
+    ratings.push({ taskId: pendingRatingTaskId, score: selectedRating, at: Date.now() });
+    lsSet('sc_ratings', ratings);
+    pendingRatingTaskId = null;
+  }
+  document.getElementById('ratingSuccess').classList.remove('hidden');
+  document.querySelector('.submit-rating').disabled = true;
+}
+
+/* ==========================
+   初始化：恢復上次登入的老人資料
+========================== */
+(function init() {
+  var saved = lsGet('sc_elder_user');
+  if (saved) {
+    currentElderUser = saved;
+    document.getElementById('showName').textContent    = saved.name;
+    document.getElementById('showAge').textContent     = saved.age + ' 歲';
+    document.getElementById('showAddress').textContent = saved.address;
+    document.getElementById('showPhone').textContent   = saved.phone;
+    document.getElementById('hello').textContent       = '您好，' + saved.name;
+    // 預填登入欄位
+    document.getElementById('elderName').value    = saved.name;
+    document.getElementById('elderAge').value     = saved.age;
+    document.getElementById('elderAddress').value = saved.address;
+    document.getElementById('elderPhone').value   = saved.phone;
+  }
+})();
+</script>
+</body>
+</html>

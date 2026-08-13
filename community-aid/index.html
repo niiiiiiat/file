@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社區互助平台</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rose:#d9475e;--rose-h:#b83650;--rose-light:#fbeaed;--rose-xlight:#fdf5f6;
+  --mint:#3daa7e;--mint-light:#eaf7f2;
+  --bg:#f9f9f9;--card:#fff;
+  --border:#e8e4e0;--border2:#d8d3ce;
+  --text:#1e1a17;--sub:#7a706b;--xs:#b0a8a3;
+  --sh:0 1px 8px rgba(0,0,0,.06);
+  --shm:0 3px 16px rgba(0,0,0,.1);
+  --shl:0 8px 32px rgba(0,0,0,.14);
+  --font:'Helvetica Neue','PingFang TC','Microsoft JhengHei',sans-serif;
+}
+/* floating hearts */
+.hbg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
+.hf{position:absolute;opacity:0;animation:floatUp linear infinite;}
+@keyframes floatUp{0%{transform:translateY(105vh);opacity:0}8%{opacity:.12}85%{opacity:.05}100%{transform:translateY(-40px);opacity:0}}
+@keyframes hb{0%,100%{transform:scale(1)}15%{transform:scale(1.3)}30%{transform:scale(1)}45%{transform:scale(1.15)}70%{transform:scale(1)}}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;}
+.role-wrap{width:100%;max-width:540px;padding:32px 24px;position:relative;z-index:1;}
+.role-logo{text-align:center;margin-bottom:32px;}
+.role-logo .rl-icon{font-size:52px;display:block;margin-bottom:10px;animation:hb 2.5s ease-in-out infinite;}
+.role-logo h1{font-size:26px;font-weight:900;color:var(--rose);margin-bottom:4px;letter-spacing:.2px;}
+.role-logo p{font-size:13px;color:var(--sub);font-weight:600;}
+.role-card{
+  width:100%;margin:12px 0;padding:22px 20px;
+  border:1.5px solid var(--border2);border-radius:14px;
+  background:var(--card);text-align:left;cursor:pointer;
+  display:flex;align-items:center;gap:16px;
+  transition:box-shadow .2s,border-color .2s;
+  box-shadow:var(--sh);
+}
+.role-card:hover{box-shadow:var(--shm);border-color:var(--rose);}
+.role-card .rc-icon{font-size:40px;flex-shrink:0;width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.role-card.volunteer .rc-icon{background:var(--rose-light);}
+.role-card.elder .rc-icon{background:var(--mint-light);}
+.role-card strong{display:block;font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.role-card span{font-size:12px;color:var(--sub);font-weight:600;line-height:1.5;}
+.role-card.volunteer{border-color:var(--border2);}
+.role-card.volunteer:hover{border-color:var(--rose);box-shadow:0 4px 18px rgba(217,71,94,.15);}
+.role-card.elder{border-color:var(--border2);}
+.role-card.elder:hover{border-color:var(--mint);box-shadow:0 4px 18px rgba(61,170,126,.15);}
+</style>
+</head>
+<body>
+<div class="hbg" id="hbg"></div>
+<div class="role-wrap">
+  <div class="role-logo">
+    <span class="rl-icon">🤝</span>
+    <h1>社區互助平台</h1>
+    <p>請選擇您的身份，開始使用平台</p>
+  </div>
+  <button class="role-card volunteer" onclick="location.href='volunteer.html'">
+    <span class="rc-icon">💪</span>
+    <div>
+      <strong>我是志工（年輕人）</strong>
+      <span>我想幫助需要協助的長輩，成為銀伴志工</span>
+    </div>
+  </button>
+  <button class="role-card elder" onclick="location.href='elder.html'">
+    <span class="rc-icon">👴</span>
+    <div>
+      <strong>我需要幫助（長輩）</strong>
+      <span>我需要有人協助生活上的事務或緊急求救</span>
+    </div>
+  </button>
+</div>
+<script>
+(function(){
+  var bg=document.getElementById('hbg');
+  var ic=['❤️','🧡','💛','💜','🩷','🌸','✨','🤍','💗'];
+  for(var i=0;i<18;i++){
+    var el=document.createElement('div');
+    el.className='hf';
+    el.textContent=ic[Math.floor(Math.random()*ic.length)];
+    el.style.left=Math.random()*100+'%';
+    el.style.animationDelay=Math.random()*12+'s';
+    el.style.animationDuration=(8+Math.random()*8)+'s';
+    el.style.fontSize=(10+Math.random()*12)+'px';
+    bg.appendChild(el);
+  }
+})();
+</script>
+</body>
+</html>
