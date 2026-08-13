@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>銀伴 Silver Companion</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -169,45 +170,92 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
 /* ── LIST PAGE ── */
 .filter-bar{
   display:flex;align-items:center;justify-content:space-between;
-  gap:12px;flex-wrap:wrap;margin-bottom:18px;
-  background:var(--card);border-radius:14px;padding:14px 18px;
-  border:1.5px solid var(--border);
+  gap:10px;flex-wrap:wrap;
+  background:var(--card);border-radius:12px;padding:10px 14px;
+  border:1.5px solid var(--border);margin-bottom:10px;
 }
 .chip-wrap{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
 .chip{padding:5px 13px;border-radius:50px;border:1.5px solid var(--border2);background:var(--bg);color:var(--sub);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;}
 .chip:hover{border-color:var(--rose);color:var(--rose);background:var(--rose-xlight);}
 .chip.active{background:var(--rose);color:#fff;border-color:var(--rose);}
-.sort-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.sort-label{font-size:11px;color:var(--xs);font-weight:700;letter-spacing:.5px;}
-.ss{padding:6px 12px;border-radius:8px;border:1.5px solid var(--border2);background:var(--bg);font-size:12px;color:var(--text);cursor:pointer;outline:none;font-weight:700;transition:border-color .2s;font-family:var(--font);}
-.ss:hover,.ss:focus{border-color:var(--rose);}
 
-/* cards grid */
-.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
-.tc{
-  background:var(--card);border-radius:12px;
-  border:1px solid var(--border);padding:16px;
-  box-shadow:var(--sh);cursor:pointer;
-  display:flex;flex-direction:column;gap:9px;
-  transition:border-color .2s,box-shadow .2s;
+/* 地圖容器 */
+.map-wrap{position:relative;border-radius:14px;overflow:hidden;border:1.5px solid var(--border);box-shadow:var(--sh);}
+#elderMap{width:100%;height:calc(100vh - 230px);min-height:400px;}
+
+/* 地圖詳情側邊欄 */
+.map-side{
+  position:absolute;top:12px;right:12px;
+  width:290px;
+  background:var(--card);
+  border-radius:14px;
+  border:1.5px solid var(--border);
+  box-shadow:var(--shl);
+  z-index:900;
+  transform:translateX(110%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+  max-height:calc(100vh - 260px);
+  overflow-y:auto;
 }
-.tc:hover{box-shadow:var(--shm);border-color:var(--border2);}
-.card-top{display:flex;align-items:flex-start;gap:10px;}
-.card-emo{width:40px;height:40px;border-radius:10px;background:var(--rose-xlight);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.card-meta{flex:1;}
-.card-name{font-size:14px;font-weight:800;color:var(--text);}
-.card-age{font-size:11px;color:var(--xs);font-weight:600;margin-top:1px;}
-.ctag{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:var(--mint-light);color:var(--mint);margin-left:auto;}
-.card-row{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--sub);line-height:1.5;}
-.card-note{font-size:11px;color:var(--sub);background:var(--bg);border-radius:6px;padding:6px 8px;line-height:1.5;}
-.btn-h{
-  width:100%;background:var(--rose);
-  color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;
-  padding:9px;cursor:pointer;margin-top:2px;
+.map-side.open{transform:translateX(0);}
+.map-side-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 10px;
+  border-bottom:1px solid var(--border);
+}
+.map-side-close{
+  background:none;border:none;cursor:pointer;
+  font-size:18px;color:var(--sub);padding:2px 6px;border-radius:6px;
   transition:background .2s;
 }
-.btn-h:hover{background:var(--rose-h);}
+.map-side-close:hover{background:var(--bg);}
+.map-side-body{padding:14px 16px 18px;}
+.map-side-emo{font-size:36px;text-align:center;margin-bottom:6px;}
+.map-side-name{font-size:16px;font-weight:800;color:var(--text);text-align:center;}
+.map-side-sub{font-size:12px;color:var(--sub);text-align:center;margin-top:2px;}
+.map-side-tag{display:inline-flex;padding:2px 9px;border-radius:4px;font-size:10px;font-weight:700;background:var(--mint-light);color:var(--mint);margin:8px auto 0;display:block;width:fit-content;}
+.map-side-rows{margin:12px 0 0;display:flex;flex-direction:column;gap:7px;}
+.map-side-row{display:flex;gap:7px;font-size:12px;color:var(--sub);line-height:1.5;}
+.map-side-row b{color:var(--text);font-weight:700;flex-shrink:0;}
+.map-side-note{background:var(--bg);border-radius:8px;padding:9px 10px;font-size:11px;color:var(--sub);margin-top:8px;line-height:1.5;}
+.map-side-btns{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+.map-accept-btn{
+  width:100%;background:var(--rose);color:#fff;border:none;
+  border-radius:8px;padding:10px;font-size:13px;font-weight:700;
+  cursor:pointer;transition:background .2s;
+}
+.map-accept-btn:hover{background:var(--rose-h);}
+.map-accept-btn:disabled{background:#ccc;cursor:not-allowed;}
+.map-detail-btn{
+  width:100%;background:none;color:var(--rose);
+  border:1.5px solid var(--rose);
+  border-radius:8px;padding:8px;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+}
+.map-detail-btn:hover{background:var(--rose-xlight);}
+
+/* 自訂 marker */
+.mk{
+  background:var(--card);
+  border:2.5px solid var(--rose);
+  border-radius:50%;
+  width:42px;height:42px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  cursor:pointer;
+  box-shadow:0 2px 10px rgba(0,0,0,.18);
+  transition:transform .15s, box-shadow .15s;
+}
+.mk:hover,.mk.active{transform:scale(1.18);box-shadow:0 4px 16px rgba(217,71,94,.35);border-color:var(--rose-h);}
+.mk.urgent{border-color:#c0392b;background:#fff0ee;}
+
+/* no results on map */
 .no-r{text-align:center;color:var(--sub);padding:56px 20px;font-size:14px;}
+@media(max-width:600px){
+  .map-side{width:calc(100% - 24px);top:auto;bottom:12px;right:12px;left:12px;transform:translateY(110%);}
+  .map-side.open{transform:translateY(0);}
+  #elderMap{height:calc(100vh - 250px);}
+}
 
 /* ── DETAIL ── */
 .back-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
@@ -415,7 +463,22 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
   .dgrid{grid-template-columns:1fr 1fr;}
   .filter-bar{flex-direction:column;align-items:flex-start;}
 }
+/* Leaflet tooltip 自訂樣式 */
+.mk-tooltip{
+  background:var(--card)!important;
+  border:1.5px solid var(--border)!important;
+  border-radius:8px!important;
+  box-shadow:var(--shm)!important;
+  color:var(--text)!important;
+  font-family:var(--font)!important;
+  font-size:12px!important;
+  padding:5px 10px!important;
+  white-space:nowrap;
+}
+.mk-tooltip.leaflet-tooltip-top::before{border-top-color:var(--border)!important;}
+.leaflet-container{font-family:var(--font)!important;}
 </style>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 <!-- FLOATING HEARTS -->
@@ -568,21 +631,22 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
           <button class="btn-cta" onclick="goPage('list')">查看需要幫助的人 →</button>
         </div>
       </div>
-      <!-- LIST -->
+      <!-- LIST (地圖模式) -->
       <div class="page" id="page-list">
         <div class="filter-bar">
           <div class="chip-wrap" id="catChips"></div>
-          <div class="sort-wrap">
-            <span class="sort-label">排序</span>
-            <select class="ss" id="sortSelect" onchange="renderCards()">
-              <option value="default">預設</option>
-              <option value="time">依時間</option>
-              <option value="distance">依距離</option>
-              <option value="newest">最新需求</option>
-            </select>
+        </div>
+        <div class="map-wrap">
+          <div id="elderMap"></div>
+          <!-- 詳情側邊欄 -->
+          <div class="map-side" id="mapSide">
+            <div class="map-side-header">
+              <span style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.4px;">任務詳情</span>
+              <button class="map-side-close" onclick="closeMapSide()">✕</button>
+            </div>
+            <div class="map-side-body" id="mapSideBody"></div>
           </div>
         </div>
-        <div class="cg" id="cardsGrid"></div>
       </div>
       <!-- DETAIL -->
       <div class="page" id="page-detail">
@@ -756,7 +820,7 @@ function goPage(n){
   document.querySelectorAll('.sb-item').forEach(function(a){a.classList.toggle('active',a.dataset.page===n);});
   document.getElementById('topbarTitle').innerHTML=PAGE_TITLE[n]||'銀伴';
   document.getElementById('sidebar').classList.remove('open');
-  if(n==='list')renderCards();
+  if(n==='list')renderMap();
   if(n==='mytasks')renderMy();
   if(n==='profile'||n==='home')updateStats();
   document.querySelector('.main').scrollTo({top:0,behavior:'smooth'});
@@ -768,33 +832,138 @@ function buildChips(){
     return '<div class="chip'+(c===curCat?' active':'')+'" onclick="selCat(\''+c+'\')">'+c+'</div>';
   }).join('');
 }
-function selCat(c){curCat=c;buildChips();renderCards();}
+function selCat(c){curCat=c;buildChips();renderMap();}
 
-function renderCards(){
+/* ── 地圖相關全域 ── */
+var elderMapInstance=null;
+var mapMarkers=[];
+var activeMarkerId=null;
+
+/* 取任務對應的地圖座標（老人送出需求時 area 是地址字串，先解析城市關鍵字推估） */
+function getCoords(t){
+  // 先查精確座標表
+  if(AREA_COORDS[t.area]) return AREA_COORDS[t.area];
+  // 嘗試模糊比對
+  var keys=Object.keys(AREA_COORDS);
+  for(var i=0;i<keys.length;i++){
+    if(t.area&&t.area.indexOf(keys[i])>=0) return AREA_COORDS[keys[i]];
+  }
+  // 找不到：用高雄市中心並加小偏移避免重疊
+  return [22.6328+Math.random()*0.06-0.03, 120.3016+Math.random()*0.06-0.03];
+}
+
+function renderMap(){
   buildChips();
-  var sort=document.getElementById('sortSelect').value;
   var all=getTasks();
   var f=all.filter(function(t){return t.status==='open';});
-  if(curCat!=='全部')f=f.filter(function(t){return t.category===curCat;});
-  if(sort==='distance')f.sort(function(a,b){return a.distance-b.distance;});
-  else if(sort==='time')f.sort(function(a,b){return a.createdAt-b.createdAt;});
-  else if(sort==='newest')f.sort(function(a,b){return b.createdAt-a.createdAt;});
-  var g=document.getElementById('cardsGrid');
-  if(!f.length){g.innerHTML='<div class="no-r">🌸 目前此分類沒有等待中的需求</div>';return;}
-  g.innerHTML=f.map(function(t){
-    return '<div class="tc" onclick="openDetail(\''+t.id+'\')">'
-      +'<div class="card-top">'
-      +'<div class="card-emo">'+t.emoji+'</div>'
-      +'<div class="card-meta"><div class="card-name">'+t.name+'</div><div class="card-age">'+t.age+' 歲</div></div>'
-      +'<div class="ctag">'+t.category+'</div>'
-      +'</div>'
-      +'<div class="card-row"><span>📍</span> '+t.area+'</div>'
-      +'<div class="card-row"><span>🙏</span> '+t.need+'</div>'
-      +'<div class="card-row"><span>📅</span> '+t.date+' '+t.time+'</div>'
-      +'<div class="card-note">📝 '+t.note+'</div>'
-      +'<button class="btn-h" onclick="event.stopPropagation();askAccept(\''+t.id+'\')">我要幫助你 🤝</button>'
-      +'</div>';
-  }).join('');
+  if(curCat!=='全部') f=f.filter(function(t){return t.category===curCat;});
+
+  // 初始化地圖（只建一次）
+  if(!elderMapInstance){
+    elderMapInstance=L.map('elderMap',{zoomControl:true}).setView([22.6328,120.3016],12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      attribution:'© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
+      maxZoom:19
+    }).addTo(elderMapInstance);
+    // 點地圖空白處關閉側邊欄
+    elderMapInstance.on('click',function(){closeMapSide();});
+  }
+
+  // 清除舊 marker
+  mapMarkers.forEach(function(m){elderMapInstance.removeLayer(m.layer);});
+  mapMarkers=[];
+
+  if(!f.length){
+    document.getElementById('mapSideBody').innerHTML='<div class="no-r">🌸 此分類目前沒有等待中的需求</div>';
+    document.getElementById('mapSide').classList.add('open');
+    return;
+  }
+
+  f.forEach(function(t){
+    var coords=getCoords(t);
+    var isUrgent=(t.category==='緊急求救');
+    var el=document.createElement('div');
+    el.className='mk'+(isUrgent?' urgent':'');
+    el.textContent=t.emoji;
+    el.title=t.name;
+
+    var icon=L.divIcon({html:el.outerHTML,className:'',iconSize:[42,42],iconAnchor:[21,21]});
+    var marker=L.marker(coords,{icon:icon}).addTo(elderMapInstance);
+
+    // 滑過顯示小 tooltip
+    marker.bindTooltip(
+      '<b>'+t.name+'</b><br><span style="font-size:11px">'+t.need+'</span>',
+      {direction:'top',offset:[0,-24],className:'mk-tooltip'}
+    );
+
+    // 點擊開啟側邊詳情
+    marker.on('click',function(e){
+      L.DomEvent.stopPropagation(e);
+      showMapSide(t.id);
+      // 更新 active 樣式
+      mapMarkers.forEach(function(m2){
+        m2.layer.getElement()&&m2.layer.getElement().querySelector&&
+        m2.layer.getElement().querySelector('.mk')&&
+        m2.layer.getElement().querySelector('.mk').classList.remove('active');
+      });
+      marker.getElement()&&marker.getElement().querySelector&&
+      marker.getElement().querySelector('.mk')&&
+      marker.getElement().querySelector('.mk').classList.add('active');
+      activeMarkerId=t.id;
+    });
+
+    mapMarkers.push({id:t.id,layer:marker});
+  });
+
+  // 自動縮放到所有 marker 範圍
+  if(mapMarkers.length){
+    var group=L.featureGroup(mapMarkers.map(function(m){return m.layer;}));
+    elderMapInstance.fitBounds(group.getBounds().pad(0.3));
+  }
+
+  // 地圖大小重算（切換頁面可能造成尺寸異常）
+  setTimeout(function(){elderMapInstance.invalidateSize();},120);
+}
+
+function showMapSide(taskId){
+  var all=getTasks();
+  var t=all.find(function(x){return x.id===taskId;});
+  if(!t)return;
+  var my=getMyTasks();
+  var m=my.find(function(x){return x.taskId===taskId;});
+  var alreadyTaken=!!m;
+
+  document.getElementById('mapSideBody').innerHTML=
+    '<div class="map-side-emo">'+t.emoji+'</div>'
+    +'<div class="map-side-name">'+t.name+'</div>'
+    +'<div class="map-side-sub">'+t.age+' 歲</div>'
+    +'<div class="map-side-tag">'+t.category+'</div>'
+    +'<div class="map-side-rows">'
+    +'<div class="map-side-row"><b>🙏 需求</b>'+t.need+'</div>'
+    +'<div class="map-side-row"><b>📍 地點</b>'+t.area+'</div>'
+    +'<div class="map-side-row"><b>📅 日期</b>'+t.date+' '+t.time+'</div>'
+    +'<div class="map-side-row"><b>⏱ 時長</b>'+t.duration+'</div>'
+    +(t.elderPhone?'<div class="map-side-row"><b>📞 電話</b>'+t.elderPhone+'</div>':'')
+    +'</div>'
+    +'<div class="map-side-note">📝 '+t.note+'</div>'
+    +'<div class="map-side-btns">'
+    +'<button class="map-accept-btn"'+(alreadyTaken?' disabled':'')+' onclick="askAccept(\''+t.id+'\')">'
+    +(alreadyTaken?'已接單 ✓':'我要幫助你 🤝')+'</button>'
+    +'<button class="map-detail-btn" onclick="openDetail(\''+t.id+'\')">查看完整詳情 →</button>'
+    +'</div>';
+
+  document.getElementById('mapSide').classList.add('open');
+}
+
+function closeMapSide(){
+  document.getElementById('mapSide').classList.remove('open');
+  // 移除 active marker 樣式
+  mapMarkers.forEach(function(m){
+    m.layer.getElement()&&m.layer.getElement().querySelector&&
+    m.layer.getElement().querySelector('.mk')&&
+    m.layer.getElement().querySelector('.mk').classList.remove('active');
+  });
+  activeMarkerId=null;
 }
 
 function openDetail(id){
@@ -899,7 +1068,8 @@ function confirmAccept(){
   startTimer(pendingId,now);
   pendingId=null;
   updateStats();
-  renderCards();
+  // 地圖模式：重繪 marker（接單後從地圖上移除）
+  if(elderMapInstance) renderMap();
   toast('❤️ 接單成功！計時已開始 ⏱');
 }
 
