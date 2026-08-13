@@ -328,6 +328,15 @@ input:focus {
   font-size: 22px;
   margin-top: 18px;
   color: var(--text);
+  width: 100%;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+  outline: none;
+  transition: border-color .2s;
+}
+.transcript:focus {
+  border-color: var(--rose);
 }
 
 .voice-hint {
@@ -668,9 +677,9 @@ input:focus {
   <p>遇到需要幫忙的事情，可以用語音告訴我們。</p>
   <!-- 語音求救 -->
   <div class="voice-box">
-    <h3>🎙 用語音說明需要什麼幫忙</h3>
-    <p class="voice-hint">例如：「我的燈泡壞了，想請人幫忙更換。」</p>
-    <div id="transcript" class="transcript">您說的內容會顯示在這裡……</div>
+    <h3>🎙 用語音或文字說明需要什麼幫忙</h3>
+    <p class="voice-hint">可以按麥克風說話，或直接在下方框框打字。</p>
+    <textarea id="transcript" class="transcript" placeholder="例如：我的燈泡壞了，想請人幫忙更換。" rows="4"></textarea>
     <div class="voice-action-group">
       <button id="voiceBtn" class="voice-btn" onclick="toggleVoice()">🎤 按一下開始說話</button>
       <button class="confirm-btn" onclick="confirmVoiceHelp()">✓ 確定送出</button>
@@ -903,7 +912,7 @@ function toggleVoice() {
     for (var i = event.resultIndex; i < event.results.length; i++) {
       text += event.results[i][0].transcript;
     }
-    document.getElementById('transcript').textContent = text;
+    document.getElementById('transcript').value = text;
   };
   recognition.onerror = function(event) { alert('語音輸入發生問題：' + event.error); };
   recognition.onend = function() {
@@ -920,9 +929,9 @@ function toggleVoice() {
 ========================== */
 function confirmVoiceHelp() {
   if (isRecording) recognition.stop();
-  var text = document.getElementById('transcript').textContent.trim();
-  if (!text || text === '您說的內容會顯示在這裡……') {
-    alert('請先用語音說明您需要什麼幫忙。'); return;
+  var text = document.getElementById('transcript').value.trim();
+  if (!text) {
+    alert('請先用語音說話或直接打字說明您需要什麼幫忙。'); return;
   }
   submitRequest(text, '語音需求', '📣');
 }
@@ -965,7 +974,7 @@ function submitRequest(need, category, emoji) {
   tasks.push(task);
   lsSet('sc_tasks', tasks);
   document.getElementById('helpResult').classList.remove('hidden');
-  document.getElementById('transcript').textContent = '您說的內容會顯示在這裡……';
+  document.getElementById('transcript').value = '';
   renderMyRequests();
 }
 
